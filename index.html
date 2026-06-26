@@ -103,13 +103,12 @@ body{font-family:var(--font);background:var(--onyx);color:var(--txt);min-height:
 
 /* ── FUNIL ── */
 .funil-card{background:var(--surface);border:1px solid var(--borda);border-radius:var(--radius);padding:22px 26px;margin-bottom:22px}
-.funil-row{display:grid;grid-template-columns:160px 1fr 70px;align-items:center;gap:12px;margin-bottom:7px}
-.funil-lbl{font-size:11px;color:var(--txt2);text-align:right;font-weight:500}
-.funil-bar-wrap{height:26px;background:var(--surface3);border-radius:5px;overflow:hidden;position:relative}
-.funil-bar{height:100%;border-radius:5px;width:0;transition:width 1.3s cubic-bezier(.4,0,.2,1)}
-.funil-bar .pct{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:700;color:rgba(255,255,255,.75)}
-.funil-val{font-size:18px;font-weight:800;text-align:right;letter-spacing:-.5px}
-.funil-div{height:1px;background:var(--borda);margin:4px 0;grid-column:1/-1}
+.funil-row{display:grid;grid-template-columns:200px 1fr 70px;align-items:center;gap:12px;margin-bottom:7px}
+.funil-lbl{font-size:11px;color:var(--txt2);text-align:right;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;}
+.funil-bar-wrap{height:24px;background:var(--surface3);border-radius:4px;overflow:hidden;position:relative}
+.funil-bar{height:100%;border-radius:4px;width:0;transition:width 1.3s cubic-bezier(.4,0,.2,1)}
+.funil-bar .pct{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;color:rgba(255,255,255,.9)}
+.funil-val{font-size:16px;font-weight:700;text-align:right;letter-spacing:-.5px;color:var(--txt)}
 
 /* ── TABLE ── */
 .table-card{background:var(--surface);border:1px solid var(--borda);border-radius:var(--radius);overflow:hidden;margin-bottom:22px}
@@ -149,7 +148,7 @@ tbody td{padding:10px 14px;color:var(--txt);white-space:nowrap;max-width:200px;o
   .main{padding:16px}
   .header{padding:12px 16px}
   .filters-bar{padding:12px 16px}
-  .funil-row{grid-template-columns:120px 1fr 56px}
+  .funil-row{grid-template-columns:140px 1fr 40px}
 }
 @media(max-width:480px){.kpi-row{grid-template-columns:1fr}}
 </style>
@@ -242,7 +241,7 @@ tbody td{padding:10px 14px;color:var(--txt);white-space:nowrap;max-width:200px;o
     </div>
     <div class="footer-right">
       <span id="last-update">—</span>
-      <span class="version-badge">v1.0.0</span>
+      <span class="version-badge">v1.1.0</span>
     </div>
   </footer>
 </div>
@@ -253,7 +252,7 @@ tbody td{padding:10px 14px;color:var(--txt);white-space:nowrap;max-width:200px;o
 // ═══════════════════════════════════════════
 const SUPABASE_URL = 'https://gpilasgpumovlmnsdycq.supabase.co'
 const SUPABASE_KEY = 'sb_publishable_Liymz5H6GqF6uNO1g9nD9A_UPfRCqn8'
-const VERSION      = 'v1.0.0'
+const VERSION      = 'v1.1.0'
 const REFRESH_SEC  = 300  // 5 minutos
 
 const { createClient } = window.supabase
@@ -274,7 +273,7 @@ async function init() {
     showDash(session.user.email)
     loadData()
   }
-  // enter key no login
+  
   document.getElementById('login-pass').addEventListener('keydown', e => {
     if (e.key === 'Enter') doLogin()
   })
@@ -394,8 +393,22 @@ function processEvents(events) {
     if (ev.payload?.campanha)    l.campanha = ev.payload.campanha
     if (ev.payload?.status_cadencia) l.status_cadencia = ev.payload.status_cadencia
 
-    if (ev.event_type === 'status_changed' || ev.event_type === 'lead.status_changed')
-      l.status = ev.status
+    if (ev.event_type === 'status_changed' || ev.event_type === 'lead.status_changed') {
+      let st = ev.status || '';
+      
+      // Tradução de IDs para Nomes Baseados no Mapeamento
+      if (st === '107975211') st = 'D3';
+      if (st === '107210679') st = 'D7'; 
+      if (st === '107977459') st = 'REUNIÃO AGENDADA';
+      if (st === '107211175') st = 'GANHO';
+      
+      // Agrupamento Inteligente de Perdidos
+      if (st.toLowerCase().startsWith('perdido')) {
+        l.status = 'PERDIDO';
+      } else {
+        l.status = st.toUpperCase();
+      }
+    }
 
     if (ev.event_type === 'lead_responded')      l.respondeu = true
     if (ev.event_type === 'send_error')          l.erro      = true
@@ -406,10 +419,8 @@ function processEvents(events) {
     if (ev.event_type === 'cadencia_d1' && !l.cadencia)         l.cadencia = 'D1'
   })
 
-  return Object.values(leads).filter(l => {
-    const name = (l.name || '').toLowerCase()
-    return !['teste', 'lead #'].some(t => name.includes(t))
-  })
+  // Retorna todos os leads (Filtro de "teste" removido)
+  return Object.values(leads)
 }
 
 // ═══════════════════════════════════════════
@@ -471,8 +482,8 @@ function renderDash() {
       <div class="table-scroll"><table id="leads-table">
         <thead><tr>
           <th>Nome</th><th>Produto</th><th>Valor</th>
-          <th>Campanha</th><th>Grupo</th><th>Cadência</th>
-          <th>Status</th><th>Respondeu</th><th>Leu</th><th>Erro</th>
+          <th>Campanha</th><th>Grupo</th>
+          <th>Status</th><th>Respondeu</th><th>Erro</th>
         </tr></thead>
         <tbody id="leads-tbody"></tbody>
       </table></div>
@@ -483,11 +494,11 @@ function renderDash() {
 
 function renderMetrics(leads) {
   const total    = leads.length
-  const respondeu = leads.filter(l => l.respondeu).length
-  const erros    = leads.filter(l => l.erro).length
-  const perdidos = leads.filter(l => (l.status||'').toLowerCase().includes('perdido')).length
+  const respondeu = leads.filter(l => l.respondeu || (l.status||'').includes('RESPONDEU')).length
+  const erros    = leads.filter(l => l.erro || (l.status||'').includes('ERRO')).length
+  const perdidos = leads.filter(l => (l.status||'').includes('PERDIDO')).length
   const ativos   = total - perdidos
-  const reunioes = leads.filter(l => l.reuniao).length
+  const reunioes = leads.filter(l => l.reuniao || (l.status||'').includes('AGENDADA')).length
   const taxaResp = erros < total
     ? Math.round(respondeu / (total - erros) * 100) : 0
 
@@ -498,10 +509,10 @@ function renderMetrics(leads) {
 
   document.getElementById('kpi-row').innerHTML = `
     ${kpiCard('Total na Base', total, '', 'azul', 'c-azul', `${ativos} ativos · ${perdidos} perdidos`)}
-    ${kpiCard('Responderam', respondeu, 'verde', 'verde', 'c-verde', `${taxaResp}% dos entregues`)}
-    ${kpiCard('Erro no Envio', erros, erros>0?'vermelho':'', 'vermelho', 'c-vermelho', `${total>0?Math.round(erros/total*100):0}% dos disparos`)}
-    ${kpiCard('Reuniões', reunioes, reunioes>0?'verde':'', '', 'c-roxo', reunioes === 0 ? 'nenhuma ainda' : 'realizadas')}
-    ${kpiCard('Taxa Resposta', taxaResp+'%', taxaResp>=20?'verde':taxaResp>=10?'amarelo':'vermelho', '', 'c-azul', 'sobre entregues')}
+    ${kpiCard('Responderam', respondeu, 'verde', 'verde', 'c-verde', `${taxaResp}% dos disparos entregues`)}
+    ${kpiCard('Erro no Envio', erros, erros>0?'vermelho':'', 'vermelho', 'c-vermelho', `${total>0?Math.round(erros/total*100):0}% de falha na base`)}
+    ${kpiCard('Reuniões', reunioes, reunioes>0?'verde':'', '', 'c-roxo', reunioes === 0 ? 'nenhuma confirmada ainda' : 'agendadas')}
+    ${kpiCard('Taxa Resposta', taxaResp+'%', taxaResp>=20?'verde':taxaResp>=10?'amarelo':'vermelho', '', 'c-azul', 'conversão sobre entregues')}
   `
 }
 
@@ -514,41 +525,40 @@ function kpiCard(label, val, numClass, _, cardClass, detail) {
 }
 
 function renderFunil(leads) {
-  const total    = leads.length
-  const contat   = leads.filter(l => l.cadencia).length
-  const erros    = leads.filter(l => l.erro).length
-  const entregues= contat - erros
-  const leram    = leads.filter(l => l.leu).length
-  const respondeu= leads.filter(l => l.respondeu).length
-  const conversa = leads.filter(l => (l.status||'').includes('conversa') || (l.status||'').includes('CONVERSA')).length
-  const reuniao  = leads.filter(l => l.reuniao).length
+  document.getElementById('funil-meta').textContent = `Volume atual de leads por etapa`
 
-  document.getElementById('funil-meta').textContent = `${total} leads · filtro atual`
+  const getCount = (keys) => leads.filter(l => {
+    const s = (l.status || '').toLowerCase();
+    return keys.some(k => s.includes(k));
+  }).length;
 
   const steps = [
-    { label: 'Total importados',  val: total,     cls: 'linear-gradient(90deg,#6B7FE0,#8090E8)' },
-    { label: 'Contatados',        val: contat,     cls: 'linear-gradient(90deg,#5068D4,#6B7FE0)' },
-    { label: 'Entregues',         val: entregues,  cls: 'linear-gradient(90deg,#3B55CC,#5068D4)' },
-    { label: 'Mensagem lida',     val: leram,      cls: 'linear-gradient(90deg,#2A3E99,#3B55CC)' },
-    { label: 'Responderam',       val: respondeu,  cls: 'linear-gradient(90deg,#3DBD88,#50D4A0)' },
-    { label: 'Em conversa',       val: conversa,   cls: 'linear-gradient(90deg,#F0A952,#F5C280)' },
-    { label: 'Reunião realizada', val: reuniao,    cls: 'linear-gradient(90deg,#3DBD88,#2DA070)' },
+    { label: 'Entrada', val: getCount(['entrada', 'novo']), cls: '#C4CBEF' },
+    { label: 'D1', val: getCount(['d1']), cls: '#8090E8' },
+    { label: 'D3', val: getCount(['d3']), cls: '#6B7FE0' },
+    { label: 'D7', val: getCount(['d7']), cls: '#5068D4' },
+    { label: 'Erro no Envio', val: leads.filter(l => l.erro || (l.status||'').toLowerCase().includes('erro')).length, cls: '#E85A4F' },
+    { label: 'Lead Respondeu', val: getCount(['respondeu']), cls: '#3B55CC' },
+    { label: 'Em Conversa', val: getCount(['conversa']), cls: '#2A3E99' },
+    { label: 'Interesse Mapeado', val: getCount(['interesse']), cls: '#F0A952' },
+    { label: 'Reunião Agendada', val: getCount(['reunião', 'agendada']), cls: '#9B59B6' },
+    { label: 'No Show', val: getCount(['show']), cls: '#E85A4F' },
+    { label: 'Acomp. Pós Reunião', val: getCount(['pós']), cls: '#3DBD88' },
+    { label: 'Ganho', val: getCount(['ganho']), cls: '#2DA070' },
+    { label: 'Perdido', val: getCount(['perdido']), cls: '#38383F' },
   ]
 
-  const max = total || 1
+  const max = Math.max(...steps.map(s => s.val)) || 1
   document.getElementById('funil-grid').innerHTML = steps.map((s,i) => {
     const pct = (s.val / max * 100).toFixed(1)
     return `
       <div class="funil-row">
         <div class="funil-lbl">${s.label}</div>
         <div class="funil-bar-wrap">
-          <div class="funil-bar" style="background:${s.cls};width:${pct}%">
-            <span class="pct">${pct}%</span>
-          </div>
+          <div class="funil-bar" style="background:${s.cls};width:${pct}%"></div>
         </div>
         <div class="funil-val">${s.val}</div>
       </div>
-      ${i===1||i===3?'<div class="funil-div"></div>':''}
     `
   }).join('')
 }
@@ -562,21 +572,20 @@ function renderTable(leads) {
     return
   }
 
-  tbody.innerHTML = leads.slice(0, 500).map(l => {
+  // Ordena para mostrar os respondidos primeiro
+  const sorted = [...leads].sort((a,b) => (b.respondeu?1:0) - (a.respondeu?1:0))
+
+  tbody.innerHTML = sorted.slice(0, 500).map(l => {
     const statusBadge = statusClass(l.status)
     const valor = l.valor ? `R$ ${Number(l.valor).toLocaleString('pt-BR',{maximumFractionDigits:0})}` : '—'
-    const camp  = (l.campanha || '—').replace('CAMPANHA 1 _ 08_06_2026 - Mateus Laino','C1 · 08/06')
-                                     .replace('Campanha 2','C2 · 23/06')
     return `<tr>
       <td class="td-name">${l.name || '—'}</td>
       <td>${badge(l.produto, 'azul')}</td>
       <td style="font-weight:600">${valor}</td>
-      <td style="max-width:120px">${camp}</td>
+      <td style="max-width:120px">${l.campanha || '—'}</td>
       <td>${l.fluxo ? badge('Grupo '+l.fluxo, l.fluxo==='A'?'amarelo':'verde') : '—'}</td>
-      <td>${l.cadencia ? badge(l.cadencia,'grey') : '—'}</td>
-      <td style="max-width:180px"><span class="badge ${statusBadge}" title="${l.status||''}">${shortStatus(l.status)}</span></td>
+      <td style="max-width:180px"><span class="badge ${statusBadge}" title="${l.status||''}">${l.status || 'SEM STATUS'}</span></td>
       <td>${l.respondeu ? '✅' : '—'}</td>
-      <td>${l.leu ? '👁' : '—'}</td>
       <td>${l.erro ? '❌' : '—'}</td>
     </tr>`
   }).join('')
@@ -590,30 +599,11 @@ function badge(txt, type) {
 function statusClass(s) {
   if (!s) return 'badge-grey'
   const sl = s.toLowerCase()
-  if (sl.includes('reunião') || sl.includes('interesse')) return 'badge-verde'
-  if (sl.includes('perdido')) return 'badge-vermelho'
+  if (sl.includes('reunião') || sl.includes('interesse') || sl.includes('ganho')) return 'badge-verde'
+  if (sl.includes('perdido') || sl.includes('erro') || sl.includes('show')) return 'badge-vermelho'
   if (sl.includes('respondeu') || sl.includes('conversa')) return 'badge-azul'
   if (sl.includes('d1') || sl.includes('d3') || sl.includes('d7')) return 'badge-amarelo'
   return 'badge-grey'
-}
-
-function shortStatus(s) {
-  if (!s) return 'Sem status'
-  const m = {
-    'Perdido (Não conseguimos contato)': 'Sem contato',
-    'Perdido (Sem resposta do lead)': 'Sem resposta',
-    'Perdido (Falou que não tem interesse)': 'Sem interesse',
-    'Perdido (Já comprou o bem)': 'Já comprou',
-    'Perdido (Contato incorreto)': 'Contato errado',
-    'Perdido (Comprado do concorrente)': 'Concorrente',
-    'Perdido (Não satisfeito com as condições)': 'Não satisfeito',
-    'Etapa de leads de entrada': 'Entrada',
-    'Em conversa com o cliente': 'Em conversa',
-    'LEAD RESPONDEU': 'Respondeu',
-    'INTERESSE MAPEADO': 'Interesse',
-    'REUNIÃO AGENDADA': 'Reunião agend.',
-  }
-  return m[s] || (s.length > 24 ? s.slice(0,22)+'…' : s)
 }
 
 // ═══════════════════════════════════════════
