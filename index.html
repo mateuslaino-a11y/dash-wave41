@@ -6,647 +6,527 @@
 <title>Dashboard | Operação Rodrigo — Trilha 41</title>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root {
-  --onyx:#1A1A1A; --azul:#3B55CC; --azul-esc:#2A3E99; --azul-cl:#6B7FE0;
-  --azul-pal:#C4CBEF; --creme:#EDE6D8; --surface:#222228; --surface2:#2C2C36;
-  --surface3:#38383F; --verde:#3DBD88; --verde-bg:rgba(61,189,136,.12);
-  --vermelho:#E85A4F; --verm-bg:rgba(232,90,79,.12); --amarelo:#F0A952;
-  --amar-bg:rgba(240,169,82,.12); --txt:#fff; --txt2:#A8A8BE; --txt3:#5E5E72;
-  --borda:rgba(255,255,255,.07); --borda-az:rgba(59,85,204,.3);
-  --radius:12px; --font:'Bricolage Grotesque',system-ui,sans-serif;
+  --onyx:#1A1A1A;--azul:#3B55CC;--azul-esc:#2A3E99;--azul-cl:#6B7FE0;
+  --azul-pal:#C4CBEF;--surface:#222228;--surface2:#2C2C36;--surface3:#38383F;
+  --verde:#3DBD88;--verde-bg:rgba(61,189,136,.12);
+  --vermelho:#E85A4F;--verm-bg:rgba(232,90,79,.12);
+  --amarelo:#F0A952;--amar-bg:rgba(240,169,82,.12);
+  --roxo:#9B59B6;--roxo-bg:rgba(155,89,182,.12);
+  --txt:#fff;--txt2:#A8A8BE;--txt3:#5E5E72;
+  --borda:rgba(255,255,255,.07);--borda-az:rgba(59,85,204,.3);
+  --radius:12px;--font:'Bricolage Grotesque',system-ui,sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
 body{font-family:var(--font);background:var(--onyx);color:var(--txt);min-height:100vh;-webkit-font-smoothing:antialiased}
 
-/* ── LOGIN ── */
-#page-login{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+/* LOGIN */
+#pg-login{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
 .login-card{background:var(--surface);border:1px solid var(--borda);border-radius:16px;padding:40px;width:100%;max-width:400px}
 .login-logo{display:flex;align-items:center;gap:12px;margin-bottom:32px}
-.logo-mark{width:40px;height:40px;background:var(--azul);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff;flex-shrink:0}
-.login-brand h1{font-size:18px;font-weight:700}
+.logo-mk{width:40px;height:40px;background:var(--azul);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0}
+.login-brand h1{font-size:17px;font-weight:700}
 .login-brand p{font-size:12px;color:var(--txt2);margin-top:2px}
 .login-title{font-size:22px;font-weight:800;margin-bottom:6px;letter-spacing:-.5px}
 .login-sub{font-size:13px;color:var(--txt2);margin-bottom:28px}
-.form-group{margin-bottom:16px}
-.form-group label{display:block;font-size:12px;font-weight:600;color:var(--txt2);margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase}
-.form-group input{width:100%;background:var(--surface2);border:1px solid var(--borda);border-radius:8px;padding:12px 14px;color:var(--txt);font-family:var(--font);font-size:14px;outline:none;transition:border-color .2s}
-.form-group input:focus{border-color:var(--azul)}
-.form-group input::placeholder{color:var(--txt3)}
-.btn-login{width:100%;background:var(--azul);color:#fff;border:none;border-radius:8px;padding:14px;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;margin-top:8px;transition:background .2s;letter-spacing:.3px}
+.fg{margin-bottom:16px}
+.fg label{display:block;font-size:11px;font-weight:700;color:var(--txt3);margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase}
+.fg input{width:100%;background:var(--surface2);border:1px solid var(--borda);border-radius:8px;padding:12px 14px;color:var(--txt);font-family:var(--font);font-size:14px;outline:none;transition:border-color .2s}
+.fg input:focus{border-color:var(--azul)}
+.fg input::placeholder{color:var(--txt3)}
+.btn-login{width:100%;background:var(--azul);color:#fff;border:none;border-radius:8px;padding:14px;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;margin-top:8px;transition:background .2s}
 .btn-login:hover{background:var(--azul-esc)}
 .btn-login:disabled{opacity:.5;cursor:not-allowed}
 .login-err{background:var(--verm-bg);border:1px solid rgba(232,90,79,.25);color:var(--vermelho);font-size:12px;padding:10px 12px;border-radius:8px;margin-top:12px;display:none}
 
-/* ── HEADER ── */
-.header{background:var(--surface);border-bottom:1px solid var(--borda);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-.header-left{display:flex;align-items:center;gap:14px}
-.header-title{font-size:14px;font-weight:600}
-.header-sub{font-size:11px;color:var(--txt2)}
-.header-right{display:flex;align-items:center;gap:12px}
+/* DASH */
+#pg-dash{display:none;flex-direction:column;min-height:100vh}
+
+/* HEADER */
+.hdr{background:var(--surface);border-bottom:1px solid var(--borda);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.hdr-l{display:flex;align-items:center;gap:14px}
+.hdr-title{font-size:14px;font-weight:600}
+.hdr-sub{font-size:11px;color:var(--txt2)}
+.hdr-r{display:flex;align-items:center;gap:10px}
 .badge-live{display:flex;align-items:center;gap:6px;background:var(--verde-bg);border:1px solid rgba(61,189,136,.25);color:var(--verde);font-size:11px;font-weight:700;padding:5px 10px;border-radius:20px}
 .badge-live::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--verde);animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.user-badge{font-size:11px;color:var(--txt2);background:var(--surface2);padding:5px 10px;border-radius:20px;border:1px solid var(--borda);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
-.btn-logout{background:none;border:1px solid var(--borda);color:var(--txt2);border-radius:8px;padding:6px 12px;font-family:var(--font);font-size:11px;cursor:pointer;transition:all .2s}
-.btn-logout:hover{border-color:var(--vermelho);color:var(--vermelho)}
-.btn-refresh{background:none;border:1px solid var(--borda);color:var(--txt2);border-radius:8px;padding:6px 12px;font-family:var(--font);font-size:11px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px}
-.btn-refresh:hover{border-color:var(--azul-cl);color:var(--azul-cl)}
-.btn-refresh.spinning .icon{animation:spin .8s linear infinite;display:inline-block}
 @keyframes spin{to{transform:rotate(360deg)}}
+.user-badge{font-size:11px;color:var(--txt2);background:var(--surface2);padding:5px 10px;border-radius:20px;border:1px solid var(--borda);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn-sm{background:none;border:1px solid var(--borda);color:var(--txt2);border-radius:8px;padding:6px 12px;font-family:var(--font);font-size:11px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px}
+.btn-sm:hover{border-color:var(--azul-cl);color:var(--azul-cl)}
+.btn-sm.danger:hover{border-color:var(--vermelho);color:var(--vermelho)}
+.btn-sm.spin .ic{display:inline-block;animation:spin .7s linear infinite}
 
-/* ── ALERTA ── */
-.alerta-bar{background:var(--verm-bg);border-bottom:1px solid rgba(232,90,79,.2);padding:9px 28px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--vermelho)}
-.alerta-bar strong{font-weight:700}
+/* FILTERS */
+.filters{padding:14px 28px;background:var(--surface2);border-bottom:1px solid var(--borda);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.fl{font-size:11px;color:var(--txt3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+select.fs{background:var(--surface);border:1px solid var(--borda);color:var(--txt);border-radius:8px;padding:8px 12px;font-family:var(--font);font-size:12px;cursor:pointer;outline:none;min-width:160px}
+select.fs:focus{border-color:var(--azul)}
+.sw{flex:1;min-width:200px;position:relative}
+.sw input{width:100%;background:var(--surface);border:1px solid var(--borda);color:var(--txt);border-radius:8px;padding:8px 12px 8px 32px;font-family:var(--font);font-size:12px;outline:none;transition:border-color .2s}
+.sw input:focus{border-color:var(--azul)}
+.sw input::placeholder{color:var(--txt3)}
+.sw-ic{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--txt3);font-size:14px;pointer-events:none}
+.res-count{font-size:11px;color:var(--txt3);margin-left:auto;white-space:nowrap}
+.refresh-note{font-size:10px;color:var(--txt3);white-space:nowrap}
+#next-ref{color:var(--azul-cl);font-weight:700}
 
-/* ── FILTERS ── */
-.filters-bar{padding:16px 28px;background:var(--surface2);border-bottom:1px solid var(--borda);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.filter-label{font-size:11px;color:var(--txt3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
-.filter-select{background:var(--surface);border:1px solid var(--borda);color:var(--txt);border-radius:8px;padding:8px 12px;font-family:var(--font);font-size:12px;cursor:pointer;outline:none;min-width:180px}
-.filter-select:focus{border-color:var(--azul)}
-.search-wrap{flex:1;min-width:200px;position:relative}
-.search-wrap input{width:100%;background:var(--surface);border:1px solid var(--borda);color:var(--txt);border-radius:8px;padding:8px 12px 8px 34px;font-family:var(--font);font-size:12px;outline:none;transition:border-color .2s}
-.search-wrap input:focus{border-color:var(--azul)}
-.search-wrap input::placeholder{color:var(--txt3)}
-.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--txt3);font-size:14px}
-.filter-reset{background:none;border:1px solid var(--borda);color:var(--txt2);border-radius:8px;padding:8px 12px;font-family:var(--font);font-size:12px;cursor:pointer;transition:all .2s;white-space:nowrap}
-.filter-reset:hover{border-color:var(--azul-cl);color:var(--azul-cl)}
-.results-count{font-size:11px;color:var(--txt3);margin-left:auto;white-space:nowrap}
+/* MAIN */
+.main{padding:24px 28px;max-width:1440px;margin:0 auto;flex:1}
 
-/* ── MAIN ── */
-.main{padding:24px 28px;max-width:1440px;margin:0 auto}
-
-/* ── KPI CARDS ── */
+/* KPI */
 .kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:22px}
-.kpi-card{background:var(--surface);border:1px solid var(--borda);border-radius:var(--radius);padding:20px 22px;position:relative;overflow:hidden;transition:border-color .2s;cursor:default}
-.kpi-card:hover{border-color:var(--borda-az)}
-.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
-.kpi-card.c-azul::before{background:var(--azul)}
-.kpi-card.c-verde::before{background:var(--verde)}
-.kpi-card.c-vermelho::before{background:var(--vermelho)}
-.kpi-card.c-amarelo::before{background:var(--amarelo)}
-.kpi-card.c-roxo::before{background:#9B59B6}
-.kpi-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--txt3);margin-bottom:8px}
-.kpi-num{font-size:36px;font-weight:800;letter-spacing:-1.5px;line-height:1}
-.kpi-num.verde{color:var(--verde)}
-.kpi-num.vermelho{color:var(--vermelho)}
-.kpi-num.azul{color:var(--azul-cl)}
-.kpi-num.amarelo{color:var(--amarelo)}
-.kpi-detail{font-size:11px;color:var(--txt2);margin-top:7px}
+.kc{background:var(--surface);border:1px solid var(--borda);border-radius:var(--radius);padding:20px 22px;position:relative;overflow:hidden;transition:border-color .2s}
+.kc:hover{border-color:var(--borda-az)}
+.kc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.kc.ca::before{background:var(--azul)}
+.kc.cv::before{background:var(--verde)}
+.kc.cr::before{background:var(--vermelho)}
+.kc.cam::before{background:var(--amarelo)}
+.kc.cp::before{background:var(--roxo)}
+.kl{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--txt3);margin-bottom:8px}
+.kn{font-size:36px;font-weight:800;letter-spacing:-1.5px;line-height:1}
+.kn.verde{color:var(--verde)}
+.kn.vermelho{color:var(--vermelho)}
+.kn.azul{color:var(--azul-cl)}
+.kn.amarelo{color:var(--amarelo)}
+.kn.roxo{color:var(--roxo)}
+.kd{font-size:11px;color:var(--txt2);margin-top:7px}
 
-/* ── SECTION ── */
-.section-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.section-title{font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--txt2)}
-.section-meta{font-size:11px;color:var(--txt3)}
+/* SECTION */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.st{font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--txt2)}
+.sm{font-size:11px;color:var(--txt3)}
 
-/* ── FUNIL ── */
+/* 2-COL */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px}
+
+/* FUNIL */
 .funil-card{background:var(--surface);border:1px solid var(--borda);border-radius:var(--radius);padding:22px 26px;margin-bottom:22px}
-.funil-row{display:grid;grid-template-columns:200px 1fr 70px;align-items:center;gap:12px;margin-bottom:7px}
-.funil-lbl{font-size:11px;color:var(--txt2);text-align:right;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;}
-.funil-bar-wrap{height:24px;background:var(--surface3);border-radius:4px;overflow:hidden;position:relative}
-.funil-bar{height:100%;border-radius:4px;width:0;transition:width 1.3s cubic-bezier(.4,0,.2,1)}
-.funil-bar .pct{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;color:rgba(255,255,255,.9)}
-.funil-val{font-size:16px;font-weight:700;text-align:right;letter-spacing:-.5px;color:var(--txt)}
+.fr{display:grid;grid-template-columns:170px 1fr 70px;align-items:center;gap:12px;margin-bottom:7px}
+.flbl{font-size:11px;color:var(--txt2);text-align:right;font-weight:500;line-height:1.3}
+.fbw{height:26px;background:var(--surface3);border-radius:5px;overflow:hidden;position:relative}
+.fb{height:100%;border-radius:5px;width:0;transition:width 1.3s cubic-bezier(.4,0,.2,1);position:relative}
+.fb .pct{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:700;color:rgba(255,255,255,.8)}
+.fv{font-size:18px;font-weight:800;text-align:right;letter-spacing:-.5px}
+.fdiv{height:1px;background:var(--borda);margin:4px 0;grid-column:1/-1}
 
-/* ── TABLE ── */
-.table-card{background:var(--surface);border:1px solid var(--borda);border-radius:var(--radius);overflow:hidden;margin-bottom:22px}
-.table-scroll{overflow-x:auto}
+/* PERDIDOS */
+.card{background:var(--surface);border:1px solid var(--borda);border-radius:var(--radius);padding:22px 24px}
+.motivo-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--borda)}
+.motivo-row:last-child{border-bottom:none}
+.motivo-label{font-size:12px;color:var(--txt2);flex:1}
+.motivo-bar-wrap{width:100px;height:6px;background:var(--surface3);border-radius:3px;overflow:hidden}
+.motivo-bar{height:100%;border-radius:3px;background:var(--vermelho);width:0;transition:width 1.2s ease}
+.motivo-val{font-size:13px;font-weight:800;min-width:28px;text-align:right}
+
+/* TABELA */
+.tcard{background:var(--surface);border:1px solid var(--borda);border-radius:var(--radius);overflow:hidden;margin-bottom:22px}
+.tscroll{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:12px}
 thead th{background:var(--surface2);color:var(--txt3);font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:10px 14px;text-align:left;white-space:nowrap;border-bottom:1px solid var(--borda)}
-tbody tr{border-bottom:1px solid var(--borda);transition:background .15s;cursor:default}
+tbody tr{border-bottom:1px solid var(--borda);transition:background .15s}
 tbody tr:last-child{border-bottom:none}
 tbody tr:hover{background:var(--surface2)}
-tbody td{padding:10px 14px;color:var(--txt);white-space:nowrap;max-width:200px;overflow:hidden;text-overflow:ellipsis}
-.td-name{font-weight:600;color:var(--txt);max-width:160px}
-.badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap}
-.badge-verde{background:var(--verde-bg);color:var(--verde);border:1px solid rgba(61,189,136,.2)}
-.badge-vermelho{background:var(--verm-bg);color:var(--vermelho);border:1px solid rgba(232,90,79,.2)}
-.badge-azul{background:rgba(59,85,204,.15);color:var(--azul-cl);border:1px solid rgba(59,85,204,.25)}
-.badge-amarelo{background:var(--amar-bg);color:var(--amarelo);border:1px solid rgba(240,169,82,.2)}
-.badge-grey{background:var(--surface3);color:var(--txt2);border:1px solid var(--borda)}
-.empty-state{text-align:center;padding:40px;color:var(--txt3);font-size:13px}
+tbody td{padding:10px 14px;color:var(--txt);white-space:nowrap;max-width:180px;overflow:hidden;text-overflow:ellipsis}
+.td-name{font-weight:600}
+.badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap}
+.bv{background:var(--verde-bg);color:var(--verde);border:1px solid rgba(61,189,136,.2)}
+.br{background:var(--verm-bg);color:var(--vermelho);border:1px solid rgba(232,90,79,.2)}
+.ba{background:rgba(59,85,204,.15);color:var(--azul-cl);border:1px solid rgba(59,85,204,.25)}
+.bam{background:var(--amar-bg);color:var(--amarelo);border:1px solid rgba(240,169,82,.2)}
+.bg{background:var(--surface3);color:var(--txt2);border:1px solid var(--borda)}
+.bp{background:var(--roxo-bg);color:var(--roxo);border:1px solid rgba(155,89,182,.2)}
+.empty{text-align:center;padding:40px;color:var(--txt3);font-size:13px}
 
-/* ── FOOTER ── */
-.footer{border-top:1px solid var(--borda);padding:16px 28px;display:flex;align-items:center;justify-content:space-between}
-.footer-brand{font-size:11px;color:var(--txt3)}
-.footer-brand strong{color:var(--txt2)}
-.footer-right{font-size:11px;color:var(--txt3);text-align:right}
-.version-badge{display:inline-block;background:var(--surface2);border:1px solid var(--borda);color:var(--txt3);font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:8px;letter-spacing:.5px}
-
-/* ── LOADING ── */
-.loading-overlay{display:flex;align-items:center;justify-content:center;flex:1;padding:60px;flex-direction:column;gap:16px;color:var(--txt2);font-size:13px}
+/* LOADING */
+.loading{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:60px;color:var(--txt2);font-size:13px}
 .loader{width:32px;height:32px;border:2px solid var(--surface3);border-top-color:var(--azul);border-radius:50%;animation:spin .7s linear infinite}
-.auto-refresh-note{font-size:10px;color:var(--txt3)}
-#next-refresh{color:var(--azul-cl);font-weight:600}
 
-/* ── RESPONSIVE ── */
+/* FOOTER */
+.footer{border-top:1px solid var(--borda);padding:16px 28px;display:flex;align-items:center;justify-content:space-between}
+.foot-l{font-size:11px;color:var(--txt3)}
+.foot-l strong{color:var(--txt2)}
+.foot-r{font-size:11px;color:var(--txt3);text-align:right}
+.vbadge{display:inline-block;background:var(--surface2);border:1px solid var(--borda);color:var(--txt3);font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:8px}
+
+/* RESPONSIVE */
 @media(max-width:1100px){.kpi-row{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:900px){.two-col{grid-template-columns:1fr}}
 @media(max-width:768px){
   .kpi-row{grid-template-columns:repeat(2,1fr)}
-  .main{padding:16px}
-  .header{padding:12px 16px}
-  .filters-bar{padding:12px 16px}
-  .funil-row{grid-template-columns:140px 1fr 40px}
+  .main,.hdr,.filters{padding-left:16px;padding-right:16px}
+  .fr{grid-template-columns:120px 1fr 52px}
 }
 @media(max-width:480px){.kpi-row{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
-<!-- ════════════════════════════════════ LOGIN ════════════════════════════════════ -->
-<div id="page-login">
+<!-- LOGIN -->
+<div id="pg-login">
   <div class="login-card">
     <div class="login-logo">
-      <div class="logo-mark">T41</div>
-      <div class="login-brand">
-        <h1>Trilha 41</h1>
-        <p>BDR as a Service — Ademicon</p>
-      </div>
+      <div class="logo-mk">T41</div>
+      <div class="login-brand"><h1>Trilha 41</h1><p>BDR as a Service — Ademicon</p></div>
     </div>
     <div class="login-title">Bem-vindo</div>
-    <div class="login-sub">Acesse o painel da operação com seu e-mail e senha.</div>
-    <div class="form-group">
-      <label>E-mail</label>
-      <input type="email" id="login-email" placeholder="seu@email.com" autocomplete="email">
-    </div>
-    <div class="form-group">
-      <label>Senha</label>
-      <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
-    </div>
+    <div class="login-sub">Acesse o painel com seu e-mail e senha.</div>
+    <div class="fg"><label>E-mail</label><input type="email" id="l-email" placeholder="seu@email.com" autocomplete="email"></div>
+    <div class="fg"><label>Senha</label><input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password"></div>
     <button class="btn-login" id="btn-login" onclick="doLogin()">Entrar</button>
-    <div class="login-err" id="login-err"></div>
-    <div style="font-size:10px;color:var(--txt3);margin-top:20px;text-align:center;">
-      dash.wave41.com.br · Acesso restrito
-    </div>
+    <div class="login-err" id="l-err"></div>
+    <div style="font-size:10px;color:var(--txt3);margin-top:20px;text-align:center">dash.wave41.com.br · Acesso restrito</div>
   </div>
 </div>
 
-<!-- ═════════════════════════════════ DASHBOARD ════════════════════════════════════ -->
-<div id="page-dash" style="display:none;flex-direction:column;min-height:100vh">
-
-  <!-- HEADER -->
-  <header class="header">
-    <div class="header-left">
-      <div class="logo-mark" style="width:32px;height:32px;font-size:12px">T41</div>
-      <div>
-        <div class="header-title">Operação Rodrigo Chociai — Ademicon</div>
-        <div class="header-sub">Painel executivo em tempo real</div>
-      </div>
+<!-- DASHBOARD -->
+<div id="pg-dash">
+  <header class="hdr">
+    <div class="hdr-l">
+      <div class="logo-mk" style="width:32px;height:32px;font-size:12px">T41</div>
+      <div><div class="hdr-title">Operação Rodrigo Chociai — Ademicon</div><div class="hdr-sub">Painel executivo em tempo real</div></div>
     </div>
-    <div class="header-right">
+    <div class="hdr-r">
       <div class="badge-live">AO VIVO</div>
-      <button class="btn-refresh" id="btn-refresh" onclick="refresh()" title="Atualizar dados">
-        <span class="icon">↻</span> Atualizar
-      </button>
-      <div class="user-badge" id="user-email">—</div>
-      <button class="btn-logout" onclick="doLogout()">Sair</button>
+      <button class="btn-sm" id="btn-ref" onclick="refresh()"><span class="ic">↻</span> Atualizar</button>
+      <div class="user-badge" id="u-email">—</div>
+      <button class="btn-sm danger" onclick="doLogout()">Sair</button>
     </div>
   </header>
 
-  <!-- ALERTA -->
-  <div class="alerta-bar" id="alerta-bar" style="display:none">
-    ⚠️ <span id="alerta-txt"></span>
-  </div>
-
-  <!-- FILTERS -->
-  <div class="filters-bar">
-    <span class="filter-label">Campanha</span>
-    <select class="filter-select" id="camp-filter" onchange="applyFilters()">
-      <option value="">Todas as campanhas</option>
-    </select>
-    <span class="filter-label" style="margin-left:8px">Buscar lead</span>
-    <div class="search-wrap">
-      <span class="search-icon">⌕</span>
-      <input type="text" id="search-input" placeholder="Nome, telefone, e-mail, produto..." oninput="applyFilters()">
+  <div class="filters">
+    <span class="fl">Campanha</span>
+    <select class="fs" id="f-camp" onchange="applyFilters()"><option value="">Todas</option></select>
+    <span class="fl" style="margin-left:8px">Buscar</span>
+    <div class="sw">
+      <span class="sw-ic">⌕</span>
+      <input type="text" id="f-search" placeholder="Nome, produto, motivo de perda..." oninput="applyFilters()">
     </div>
-    <button class="filter-reset" onclick="resetFilters()">Limpar filtros</button>
-    <span class="results-count" id="results-count"></span>
-    <span class="auto-refresh-note">Próxima atualização em <span id="next-refresh">5:00</span></span>
+    <button class="btn-sm" onclick="resetFilters()">Limpar</button>
+    <span class="res-count" id="res-count"></span>
+    <span class="refresh-note">Próxima atualização em <span id="next-ref">10:00</span></span>
   </div>
 
-  <!-- MAIN -->
-  <div class="main" id="main-content">
-    <div class="loading-overlay">
-      <div class="loader"></div>
-      <span>Carregando dados da operação...</span>
-    </div>
+  <div class="main" id="main">
+    <div class="loading"><div class="loader"></div><span>Carregando dados...</span></div>
   </div>
 
-  <!-- FOOTER -->
   <footer class="footer">
-    <div class="footer-brand">
-      Operado por <strong>Trilha 41</strong> para <strong>Rodrigo Chociai · Ademicon</strong>
-    </div>
-    <div class="footer-right">
-      <span id="last-update">—</span>
-      <span class="version-badge">v1.1.0</span>
-    </div>
+    <div class="foot-l">Operado por <strong>Trilha 41</strong> para <strong>Rodrigo Chociai · Ademicon</strong></div>
+    <div class="foot-r"><span id="last-upd">—</span><span class="vbadge">v2.0.0</span></div>
   </footer>
 </div>
 
 <script>
-// ═══════════════════════════════════════════
-// CONFIG
-// ═══════════════════════════════════════════
-const SUPABASE_URL = 'https://gpilasgpumovlmnsdycq.supabase.co'
-const SUPABASE_KEY = 'sb_publishable_Liymz5H6GqF6uNO1g9nD9A_UPfRCqn8'
-const VERSION      = 'v1.1.0'
-const REFRESH_SEC  = 300  // 5 minutos
+const SURL = 'https://gpilasgpumovlmnsdycq.supabase.co'
+const SKEY = 'sb_publishable_Liymz5H6GqF6uNO1g9nD9A_UPfRCqn8'
+const REFRESH_SEC = 600 // 10 minutos
 
 const { createClient } = window.supabase
-const sb = createClient(SUPABASE_URL, SUPABASE_KEY)
+const sb = createClient(SURL, SKEY)
 
-// Estado global
-let ALL_EVENTS  = []
-let ALL_LEADS   = []
-let FILTERED    = []
-let refreshTimer, countdownTimer, countdown = REFRESH_SEC
+let ALL = [], FILTERED = [], refreshTimer, cdTimer, cd = REFRESH_SEC
 
-// ═══════════════════════════════════════════
-// AUTH
-// ═══════════════════════════════════════════
+// ── AUTH ──────────────────────────────────────────────────────
 async function init() {
   const { data: { session } } = await sb.auth.getSession()
-  if (session) {
-    showDash(session.user.email)
-    loadData()
-  }
-  
-  document.getElementById('login-pass').addEventListener('keydown', e => {
-    if (e.key === 'Enter') doLogin()
-  })
-  document.getElementById('login-email').addEventListener('keydown', e => {
-    if (e.key === 'Enter') document.getElementById('login-pass').focus()
-  })
+  if (session) { showDash(session.user.email); loadData() }
+  document.getElementById('l-pass').onkeydown = e => e.key === 'Enter' && doLogin()
+  document.getElementById('l-email').onkeydown = e => e.key === 'Enter' && document.getElementById('l-pass').focus()
 }
 
 async function doLogin() {
-  const email = document.getElementById('login-email').value.trim()
-  const pass  = document.getElementById('login-pass').value
+  const email = document.getElementById('l-email').value.trim()
+  const pass  = document.getElementById('l-pass').value
   const btn   = document.getElementById('btn-login')
-  const errEl = document.getElementById('login-err')
-
+  const err   = document.getElementById('l-err')
   if (!email || !pass) { showErr('Preencha e-mail e senha.'); return }
-
-  btn.disabled = true
-  btn.textContent = 'Entrando...'
-  errEl.style.display = 'none'
-
+  btn.disabled = true; btn.textContent = 'Entrando...'; err.style.display = 'none'
   const { data, error } = await sb.auth.signInWithPassword({ email, password: pass })
-
   if (error) {
-    btn.disabled = false
-    btn.textContent = 'Entrar'
-    showErr(error.message === 'Invalid login credentials'
-      ? 'E-mail ou senha incorretos.'
-      : error.message)
+    btn.disabled = false; btn.textContent = 'Entrar'
+    showErr(error.message.includes('Invalid') ? 'E-mail ou senha incorretos.' : error.message)
     return
   }
-
-  showDash(data.user.email)
-  loadData()
+  showDash(data.user.email); loadData()
 }
 
-function showErr(msg) {
-  const el = document.getElementById('login-err')
-  el.textContent = msg
-  el.style.display = 'block'
-}
+function showErr(msg) { const e = document.getElementById('l-err'); e.textContent = msg; e.style.display = 'block' }
 
 async function doLogout() {
   await sb.auth.signOut()
-  clearInterval(refreshTimer)
-  clearInterval(countdownTimer)
-  document.getElementById('page-dash').style.display = 'none'
-  document.getElementById('page-login').style.display = 'flex'
-  document.getElementById('login-pass').value = ''
+  clearInterval(refreshTimer); clearInterval(cdTimer)
+  document.getElementById('pg-dash').style.display = 'none'
+  document.getElementById('pg-login').style.display = 'flex'
+  document.getElementById('l-pass').value = ''
   document.getElementById('btn-login').disabled = false
   document.getElementById('btn-login').textContent = 'Entrar'
 }
 
 function showDash(email) {
-  document.getElementById('page-login').style.display = 'none'
-  document.getElementById('page-dash').style.display  = 'flex'
-  document.getElementById('user-email').textContent   = email
-  startRefreshTimer()
-  startCountdown()
+  document.getElementById('pg-login').style.display = 'none'
+  document.getElementById('pg-dash').style.display = 'flex'
+  document.getElementById('pg-dash').style.flexDirection = 'column'
+  document.getElementById('u-email').textContent = email
+  startTimers()
 }
 
-// ═══════════════════════════════════════════
-// DATA
-// ═══════════════════════════════════════════
+// ── DATA ──────────────────────────────────────────────────────
 async function loadData() {
-  setRefreshing(true)
-
-  const { data, error } = await sb
-    .from('kommo_logs')
-    .select('*')
-    .order('timestamp', { ascending: true })
-
-  if (error) {
-    console.error(error)
-    setRefreshing(false)
-    return
-  }
-
-  ALL_EVENTS = data || []
-  ALL_LEADS  = processEvents(ALL_EVENTS)
-  FILTERED   = ALL_LEADS
-
-  populateCampanhaFilter()
+  spinning(true)
+  const { data, error } = await sb.from('leads_atual').select('*').order('atualizado_em', { ascending: false })
+  if (error) { console.error(error); spinning(false); return }
+  ALL = data || []
+  populateCampanhas()
+  applyFilters()
   renderDash()
-
-  const now = new Date()
-  document.getElementById('last-update').textContent =
-    `Atualizado: ${now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'})}`
-
-  setRefreshing(false)
-  resetCountdown()
+  document.getElementById('last-upd').textContent =
+    'Atualizado: ' + new Date().toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' })
+  spinning(false)
+  resetCd()
 }
 
-function processEvents(events) {
-  const leads = {}
-
-  events.forEach(ev => {
-    const id = ev.lead_id
-    if (!id) return
-
-    if (!leads[id]) {
-      leads[id] = {
-        id, name: ev.lead_name,
-        produto: ev.produto, fluxo: ev.fluxo,
-        cidade: ev.cidade, valor: ev.valor_simulacao,
-        tags: ev.tags, campanha: ev.payload?.campanha,
-        status: null, cadencia: null,
-        respondeu: false, erro: false, leu: false,
-        reuniao: false, created_at: ev.timestamp,
-      }
-    }
-
-    const l = leads[id]
-    if (ev.lead_name)            l.name    = ev.lead_name
-    if (ev.produto)              l.produto = ev.produto
-    if (ev.fluxo)                l.fluxo   = ev.fluxo
-    if (ev.valor_simulacao)      l.valor   = ev.valor_simulacao
-    if (ev.payload?.campanha)    l.campanha = ev.payload.campanha
-    if (ev.payload?.status_cadencia) l.status_cadencia = ev.payload.status_cadencia
-
-    if (ev.event_type === 'status_changed' || ev.event_type === 'lead.status_changed') {
-      let st = ev.status || '';
-      
-      // Tradução de IDs para Nomes Baseados no Mapeamento
-      if (st === '107975211') st = 'D3';
-      if (st === '107210679') st = 'D7'; 
-      if (st === '107977459') st = 'REUNIÃO AGENDADA';
-      if (st === '107211175') st = 'GANHO';
-      
-      // Agrupamento Inteligente de Perdidos
-      if (st.toLowerCase().startsWith('perdido')) {
-        l.status = 'PERDIDO';
-      } else {
-        l.status = st.toUpperCase();
-      }
-    }
-
-    if (ev.event_type === 'lead_responded')      l.respondeu = true
-    if (ev.event_type === 'send_error')          l.erro      = true
-    if (ev.event_type === 'message_read')        l.leu       = true
-    if (ev.event_type === 'meeting_attended')    l.reuniao   = true
-    if (ev.event_type === 'cadencia_d7')         l.cadencia  = 'D7'
-    if (ev.event_type === 'cadencia_d3' && l.cadencia !== 'D7') l.cadencia = 'D3'
-    if (ev.event_type === 'cadencia_d1' && !l.cadencia)         l.cadencia = 'D1'
-  })
-
-  // Retorna todos os leads (Filtro de "teste" removido)
-  return Object.values(leads)
-}
-
-// ═══════════════════════════════════════════
-// FILTERS
-// ═══════════════════════════════════════════
-function populateCampanhaFilter() {
-  const sel = document.getElementById('camp-filter')
-  const camps = [...new Set(ALL_LEADS.map(l => l.campanha).filter(Boolean))].sort()
+function populateCampanhas() {
+  const sel = document.getElementById('f-camp')
+  const camps = [...new Set(ALL.map(l => l.campanha).filter(Boolean))].sort()
   sel.innerHTML = '<option value="">Todas as campanhas</option>'
-  camps.forEach(c => {
-    const opt = document.createElement('option')
-    opt.value = c; opt.textContent = c
-    sel.appendChild(opt)
-  })
+  camps.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; sel.appendChild(o) })
 }
 
+// ── FILTERS ───────────────────────────────────────────────────
 function applyFilters() {
-  const camp  = document.getElementById('camp-filter').value
-  const query = document.getElementById('search-input').value.trim().toLowerCase()
-
-  FILTERED = ALL_LEADS.filter(l => {
-    const matchCamp  = !camp  || l.campanha === camp
-    const matchQuery = !query || [l.name, l.tags, l.cidade, l.produto, l.id,
-      l.campanha, l.status].some(f => (f||'').toLowerCase().includes(query))
-    return matchCamp && matchQuery
+  const camp = document.getElementById('f-camp').value
+  const q    = document.getElementById('f-search').value.trim().toLowerCase()
+  FILTERED = ALL.filter(l => {
+    const mc = !camp || l.campanha === camp
+    const mq = !q || [l.lead_name, l.produto, l.campanha, l.grupo_teste, l.status, l.motivo_perda, l.lead_id]
+      .some(f => (f || '').toLowerCase().includes(q))
+    return mc && mq
   })
-
-  document.getElementById('results-count').textContent =
-    query || camp ? `${FILTERED.length} de ${ALL_LEADS.length} leads` : `${ALL_LEADS.length} leads`
-
-  renderMetrics(FILTERED)
-  renderTable(FILTERED)
-  renderFunil(FILTERED)
+  document.getElementById('res-count').textContent =
+    (camp || q) ? `${FILTERED.length} de ${ALL.length} leads` : `${ALL.length} leads`
+  if (document.getElementById('kpi-row')) renderAll()
 }
 
 function resetFilters() {
-  document.getElementById('camp-filter').value = ''
-  document.getElementById('search-input').value = ''
+  document.getElementById('f-camp').value = ''
+  document.getElementById('f-search').value = ''
   applyFilters()
 }
 
-// ═══════════════════════════════════════════
-// RENDER
-// ═══════════════════════════════════════════
+// ── RENDER ────────────────────────────────────────────────────
 function renderDash() {
-  document.getElementById('main-content').innerHTML = `
-    <div class="kpi-row" id="kpi-row"></div>
-    <div class="funil-card" id="funil-section">
-      <div class="section-hd">
-        <span class="section-title">Funil da Operação</span>
-        <span class="section-meta" id="funil-meta"></span>
-      </div>
+  document.getElementById('main').innerHTML = `
+    <div id="kpi-row" class="kpi-row"></div>
+    <div class="funil-card">
+      <div class="sh"><span class="st">Funil da Operação</span><span class="sm" id="funil-meta"></span></div>
       <div id="funil-grid"></div>
     </div>
-    <div class="section-hd">
-      <span class="section-title">Leads na Base</span>
+    <div class="two-col">
+      <div class="card" id="perdidos-card">
+        <div class="sh"><span class="st">Perdidos por Motivo</span><span class="sm" id="perd-total"></span></div>
+        <div id="perdidos-list"></div>
+      </div>
+      <div class="card" id="status-card">
+        <div class="sh"><span class="st">Leads por Etapa</span></div>
+        <div id="status-list"></div>
+      </div>
     </div>
-    <div class="table-card">
-      <div class="table-scroll"><table id="leads-table">
+    <div class="sh"><span class="st">Todos os Leads</span></div>
+    <div class="tcard">
+      <div class="tscroll"><table>
         <thead><tr>
-          <th>Nome</th><th>Produto</th><th>Valor</th>
-          <th>Campanha</th><th>Grupo</th>
-          <th>Status</th><th>Respondeu</th><th>Erro</th>
+          <th>Nome</th><th>Produto</th><th>Valor</th><th>Campanha</th>
+          <th>Grupo</th><th>Status</th><th>Respondeu</th><th>Conversa</th>
+          <th>Interesse</th><th>Reunião</th><th>Erro</th>
         </tr></thead>
         <tbody id="leads-tbody"></tbody>
       </table></div>
     </div>
   `
-  applyFilters()
+  renderAll()
 }
 
-function renderMetrics(leads) {
-  const total    = leads.length
-  const respondeu = leads.filter(l => l.respondeu || (l.status||'').includes('RESPONDEU')).length
-  const erros    = leads.filter(l => l.erro || (l.status||'').includes('ERRO')).length
-  const perdidos = leads.filter(l => (l.status||'').includes('PERDIDO')).length
-  const ativos   = total - perdidos
-  const reunioes = leads.filter(l => l.reuniao || (l.status||'').includes('AGENDADA')).length
-  const taxaResp = erros < total
-    ? Math.round(respondeu / (total - erros) * 100) : 0
-
-  const erroAlert = erros > 0 && leads.length === ALL_LEADS.length
-  document.getElementById('alerta-bar').style.display = erroAlert ? 'flex' : 'none'
-  if (erroAlert) document.getElementById('alerta-txt').innerHTML =
-    `<strong>${erros} leads com ERRO NO ENVIO</strong> — mensagens não entregues. Verificar configuração WABA.`
-
-  document.getElementById('kpi-row').innerHTML = `
-    ${kpiCard('Total na Base', total, '', 'azul', 'c-azul', `${ativos} ativos · ${perdidos} perdidos`)}
-    ${kpiCard('Responderam', respondeu, 'verde', 'verde', 'c-verde', `${taxaResp}% dos disparos entregues`)}
-    ${kpiCard('Erro no Envio', erros, erros>0?'vermelho':'', 'vermelho', 'c-vermelho', `${total>0?Math.round(erros/total*100):0}% de falha na base`)}
-    ${kpiCard('Reuniões', reunioes, reunioes>0?'verde':'', '', 'c-roxo', reunioes === 0 ? 'nenhuma confirmada ainda' : 'agendadas')}
-    ${kpiCard('Taxa Resposta', taxaResp+'%', taxaResp>=20?'verde':taxaResp>=10?'amarelo':'vermelho', '', 'c-azul', 'conversão sobre entregues')}
-  `
+function renderAll() {
+  renderKpis()
+  renderFunil()
+  renderPerdidos()
+  renderStatusList()
+  renderTable()
 }
 
-function kpiCard(label, val, numClass, _, cardClass, detail) {
-  return `<div class="kpi-card ${cardClass}">
-    <div class="kpi-label">${label}</div>
-    <div class="kpi-num ${numClass}">${val}</div>
-    <div class="kpi-detail">${detail}</div>
-  </div>`
+// ── KPIs ──────────────────────────────────────────────────────
+function renderKpis() {
+  const L = FILTERED
+  const total      = L.length
+  const perdidos   = L.filter(l => l.is_perdido).length
+  const ativos     = total - perdidos
+  const respondeu  = L.filter(l => l.houve_resposta).length
+  const conversa   = L.filter(l => l.em_conversa).length
+  const interesse  = L.filter(l => l.interesse_mapeado).length
+  const reuniao    = L.filter(l => l.reuniao_agendada || l.reuniao_realizada).length
+  const erros      = L.filter(l => l.erro_envio || l.status === 'Erro no envio').length
+  const entregues  = total - erros
+  const txResp     = entregues > 0 ? Math.round(respondeu / entregues * 100) : 0
+
+  document.getElementById('kpi-row').innerHTML = [
+    kc('Total na Base', total, 'azul', 'ca', `${ativos} ativos · ${perdidos} perdidos`),
+    kc('Responderam', respondeu, 'verde', 'cv', `${txResp}% dos entregues`),
+    kc('Em Conversa / Interesse', conversa + interesse, conversa+interesse>0?'roxo':'', 'cp', `${conversa} em conversa · ${interesse} interesse`),
+    kc('Reuniões', reuniao, reuniao>0?'verde':'', 'cv', reuniao === 0 ? 'nenhuma ainda' : `${L.filter(l=>l.reuniao_realizada).length} realizada(s)`),
+    kc('Erro no Envio', erros, erros>0?'vermelho':'', 'cr', `${total>0?Math.round(erros/total*100):0}% dos leads`),
+  ].join('')
 }
 
-function renderFunil(leads) {
-  document.getElementById('funil-meta').textContent = `Volume atual de leads por etapa`
+function kc(label, val, cls, card, detail) {
+  return `<div class="kc ${card}"><div class="kl">${label}</div><div class="kn ${cls}">${val}</div><div class="kd">${detail}</div></div>`
+}
 
-  const getCount = (keys) => leads.filter(l => {
-    const s = (l.status || '').toLowerCase();
-    return keys.some(k => s.includes(k));
-  }).length;
+// ── FUNIL ─────────────────────────────────────────────────────
+function renderFunil() {
+  const L   = FILTERED
+  const max = L.length || 1
+  const erros = L.filter(l => l.erro_envio || l.status === 'Erro no envio').length
 
   const steps = [
-    { label: 'Entrada', val: getCount(['entrada', 'novo']), cls: '#C4CBEF' },
-    { label: 'D1', val: getCount(['d1']), cls: '#8090E8' },
-    { label: 'D3', val: getCount(['d3']), cls: '#6B7FE0' },
-    { label: 'D7', val: getCount(['d7']), cls: '#5068D4' },
-    { label: 'Erro no Envio', val: leads.filter(l => l.erro || (l.status||'').toLowerCase().includes('erro')).length, cls: '#E85A4F' },
-    { label: 'Lead Respondeu', val: getCount(['respondeu']), cls: '#3B55CC' },
-    { label: 'Em Conversa', val: getCount(['conversa']), cls: '#2A3E99' },
-    { label: 'Interesse Mapeado', val: getCount(['interesse']), cls: '#F0A952' },
-    { label: 'Reunião Agendada', val: getCount(['reunião', 'agendada']), cls: '#9B59B6' },
-    { label: 'No Show', val: getCount(['show']), cls: '#E85A4F' },
-    { label: 'Acomp. Pós Reunião', val: getCount(['pós']), cls: '#3DBD88' },
-    { label: 'Ganho', val: getCount(['ganho']), cls: '#2DA070' },
-    { label: 'Perdido', val: getCount(['perdido']), cls: '#38383F' },
+    { label: 'Total importados',    val: L.length,                                         cor: 'linear-gradient(90deg,#6B7FE0,#8090E8)' },
+    { label: 'Contatados',          val: L.filter(l => l.status !== 'Etapa de leads de entrada').length, cor: 'linear-gradient(90deg,#5068D4,#6B7FE0)' },
+    { label: 'Entregues',           val: L.length - erros,                                 cor: 'linear-gradient(90deg,#3B55CC,#5068D4)' },
+    { label: 'Responderam',         val: L.filter(l => l.houve_resposta).length,           cor: 'linear-gradient(90deg,#3DBD88,#50D4A0)' },
+    { label: 'Em conversa',         val: L.filter(l => l.em_conversa).length,              cor: 'linear-gradient(90deg,#F0A952,#F5C280)' },
+    { label: 'Interesse mapeado',   val: L.filter(l => l.interesse_mapeado).length,        cor: 'linear-gradient(90deg,#F0A952,#E89540)' },
+    { label: 'Reunião agendada',    val: L.filter(l => l.reuniao_agendada).length,         cor: 'linear-gradient(90deg,#9B59B6,#B07CC6)' },
+    { label: 'Reunião realizada',   val: L.filter(l => l.reuniao_realizada).length,        cor: 'linear-gradient(90deg,#3DBD88,#2DA070)' },
   ]
 
-  const max = Math.max(...steps.map(s => s.val)) || 1
-  document.getElementById('funil-grid').innerHTML = steps.map((s,i) => {
-    const pct = (s.val / max * 100).toFixed(1)
-    return `
-      <div class="funil-row">
-        <div class="funil-lbl">${s.label}</div>
-        <div class="funil-bar-wrap">
-          <div class="funil-bar" style="background:${s.cls};width:${pct}%"></div>
-        </div>
-        <div class="funil-val">${s.val}</div>
-      </div>
-    `
-  }).join('')
+  document.getElementById('funil-meta').textContent = `${L.length} leads · ${new Date().toLocaleDateString('pt-BR')}`
+  document.getElementById('funil-grid').innerHTML = steps.map((s, i) => `
+    <div class="fr">
+      <div class="flbl">${s.label}</div>
+      <div class="fbw"><div class="fb" style="background:${s.cor};width:${(s.val/max*100).toFixed(1)}%"><span class="pct">${(s.val/max*100).toFixed(0)}%</span></div></div>
+      <div class="fv">${s.val}</div>
+    </div>
+    ${i === 2 || i === 5 ? '<div class="fdiv"></div>' : ''}
+  `).join('')
 }
 
-function renderTable(leads) {
+// ── PERDIDOS POR MOTIVO ───────────────────────────────────────
+function renderPerdidos() {
+  const perdidos = FILTERED.filter(l => l.is_perdido)
+  const counts   = {}
+  perdidos.forEach(l => { const m = l.motivo_perda || 'Não especificado'; counts[m] = (counts[m] || 0) + 1 })
+  const sorted   = Object.entries(counts).sort((a, b) => b[1] - a[1])
+  const maxVal   = sorted[0]?.[1] || 1
+
+  document.getElementById('perd-total').textContent = `${perdidos.length} perdidos`
+  document.getElementById('perdidos-list').innerHTML = sorted.length
+    ? sorted.map(([motivo, n]) => `
+        <div class="motivo-row">
+          <div class="motivo-label">${motivo}</div>
+          <div class="motivo-bar-wrap"><div class="motivo-bar" style="width:${n/maxVal*100}%"></div></div>
+          <div class="motivo-val">${n}</div>
+        </div>`).join('')
+    : '<div style="color:var(--txt3);font-size:12px;padding:12px 0">Nenhum lead perdido no filtro atual.</div>'
+}
+
+// ── STATUS LIST ───────────────────────────────────────────────
+function renderStatusList() {
+  const counts = {}
+  FILTERED.filter(l => !l.is_perdido).forEach(l => { const s = l.status || 'Sem status'; counts[s] = (counts[s] || 0) + 1 })
+  const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1])
+  const maxVal = sorted[0]?.[1] || 1
+
+  document.getElementById('status-list').innerHTML = sorted.map(([s, n]) => `
+    <div class="motivo-row">
+      <div class="motivo-label" style="color:var(--txt)">${s}</div>
+      <div class="motivo-bar-wrap"><div class="motivo-bar" style="width:${n/maxVal*100}%;background:var(--azul-cl)"></div></div>
+      <div class="motivo-val">${n}</div>
+    </div>`).join('')
+}
+
+// ── TABLE ─────────────────────────────────────────────────────
+function renderTable() {
   const tbody = document.getElementById('leads-tbody')
   if (!tbody) return
+  if (!FILTERED.length) { tbody.innerHTML = `<tr><td colspan="11" class="empty">Nenhum lead encontrado.</td></tr>`; return }
 
-  if (leads.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="10" class="empty-state">Nenhum lead encontrado para este filtro.</td></tr>`
-    return
-  }
-
-  // Ordena para mostrar os respondidos primeiro
-  const sorted = [...leads].sort((a,b) => (b.respondeu?1:0) - (a.respondeu?1:0))
-
-  tbody.innerHTML = sorted.slice(0, 500).map(l => {
-    const statusBadge = statusClass(l.status)
-    const valor = l.valor ? `R$ ${Number(l.valor).toLocaleString('pt-BR',{maximumFractionDigits:0})}` : '—'
+  tbody.innerHTML = FILTERED.slice(0, 300).map(l => {
+    const valor = l.valor_simulacao ? `R$ ${Number(l.valor_simulacao).toLocaleString('pt-BR', {maximumFractionDigits:0})}` : '—'
+    const camp  = (l.campanha || '—').replace('CAMPANHA 1 _ 08_06_2026 - Mateus Laino', 'C1 · Jun/26')
+                                     .replace('Campanha 2', 'C2 · Jun/26')
     return `<tr>
-      <td class="td-name">${l.name || '—'}</td>
-      <td>${badge(l.produto, 'azul')}</td>
+      <td class="td-name">${l.lead_name || '—'}</td>
+      <td>${l.produto ? `<span class="badge ba">${l.produto}</span>` : '—'}</td>
       <td style="font-weight:600">${valor}</td>
-      <td style="max-width:120px">${l.campanha || '—'}</td>
-      <td>${l.fluxo ? badge('Grupo '+l.fluxo, l.fluxo==='A'?'amarelo':'verde') : '—'}</td>
-      <td style="max-width:180px"><span class="badge ${statusBadge}" title="${l.status||''}">${l.status || 'SEM STATUS'}</span></td>
-      <td>${l.respondeu ? '✅' : '—'}</td>
-      <td>${l.erro ? '❌' : '—'}</td>
+      <td style="max-width:120px">${camp}</td>
+      <td>${l.grupo_teste ? `<span class="badge bam">${l.grupo_teste}</span>` : '—'}</td>
+      <td><span class="badge ${statusBadge(l)}">${shortStatus(l.status)}</span></td>
+      <td style="text-align:center">${l.houve_resposta ? '✅' : '—'}</td>
+      <td style="text-align:center">${l.em_conversa ? '💬' : '—'}</td>
+      <td style="text-align:center">${l.interesse_mapeado ? '⭐' : '—'}</td>
+      <td style="text-align:center">${l.reuniao_agendada || l.reuniao_realizada ? '📅' : '—'}</td>
+      <td style="text-align:center">${l.erro_envio || l.status === 'Erro no envio' ? '❌' : '—'}</td>
     </tr>`
   }).join('')
 }
 
-function badge(txt, type) {
-  if (!txt) return '—'
-  return `<span class="badge badge-${type}">${txt}</span>`
+function statusBadge(l) {
+  if (!l.status) return 'bg'
+  const s = l.status.toLowerCase()
+  if (l.is_perdido)           return 'br'
+  if (s.includes('interesse') || s.includes('conversa')) return 'bp'
+  if (s.includes('respondeu'))return 'bv'
+  if (s.includes('reuni'))    return 'bv'
+  if (s.includes('erro'))     return 'br'
+  if (s.includes('d1') || s.includes('d3') || s.includes('d7')) return 'bam'
+  return 'bg'
 }
 
-function statusClass(s) {
-  if (!s) return 'badge-grey'
-  const sl = s.toLowerCase()
-  if (sl.includes('reunião') || sl.includes('interesse') || sl.includes('ganho')) return 'badge-verde'
-  if (sl.includes('perdido') || sl.includes('erro') || sl.includes('show')) return 'badge-vermelho'
-  if (sl.includes('respondeu') || sl.includes('conversa')) return 'badge-azul'
-  if (sl.includes('d1') || sl.includes('d3') || sl.includes('d7')) return 'badge-amarelo'
-  return 'badge-grey'
+function shortStatus(s) {
+  if (!s) return 'Sem status'
+  const map = {
+    'Perdido (Não conseguimos contato)':'Sem contato',
+    'Perdido (Sem resposta do lead)':'Sem resposta',
+    'Perdido (Falou que não tem interesse)':'Sem interesse',
+    'Perdido (Já comprou o bem)':'Já comprou',
+    'Perdido (Contato incorreto)':'Contato errado',
+    'Perdido (Comprado do concorrente)':'Concorrente',
+    'Perdido (Não satisfeito com as condições)':'Não satisfeito',
+    'Em conversa com o cliente':'Em conversa',
+    'Etapa de leads de entrada':'Entrada',
+  }
+  return map[s] || (s.length > 22 ? s.slice(0, 20) + '…' : s)
 }
 
-// ═══════════════════════════════════════════
-// REFRESH
-// ═══════════════════════════════════════════
-function refresh() {
-  resetCountdown()
-  loadData()
-}
-
-function setRefreshing(v) {
-  const btn = document.getElementById('btn-refresh')
-  if (!btn) return
-  btn.classList.toggle('spinning', v)
-  btn.disabled = v
-}
-
-function startRefreshTimer() {
-  clearInterval(refreshTimer)
+// ── TIMERS ────────────────────────────────────────────────────
+function startTimers() {
+  clearInterval(refreshTimer); clearInterval(cdTimer)
   refreshTimer = setInterval(loadData, REFRESH_SEC * 1000)
+  resetCd()
 }
 
-function startCountdown() {
-  clearInterval(countdownTimer)
-  countdown = REFRESH_SEC
-  countdownTimer = setInterval(() => {
-    countdown--
-    const m = Math.floor(countdown / 60)
-    const s = countdown % 60
-    const el = document.getElementById('next-refresh')
-    if (el) el.textContent = `${m}:${String(s).padStart(2,'0')}`
-    if (countdown <= 0) countdown = REFRESH_SEC
+function resetCd() {
+  clearInterval(cdTimer); cd = REFRESH_SEC
+  cdTimer = setInterval(() => {
+    cd--
+    const el = document.getElementById('next-ref')
+    if (el) el.textContent = `${Math.floor(cd/60)}:${String(cd%60).padStart(2,'0')}`
+    if (cd <= 0) cd = REFRESH_SEC
   }, 1000)
 }
 
-function resetCountdown() {
-  countdown = REFRESH_SEC
-  startCountdown()
+function refresh() { resetCd(); loadData() }
+
+function spinning(v) {
+  const btn = document.getElementById('btn-ref')
+  if (!btn) return
+  btn.classList.toggle('spin', v)
+  btn.disabled = v
 }
 
-// ═══════════════════════════════════════════
-// START
-// ═══════════════════════════════════════════
 init()
 </script>
 </body>
