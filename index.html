@@ -194,7 +194,7 @@ tbody td{padding:10px 14px;color:var(--txt);white-space:nowrap;max-width:180px;o
     <div class="fg"><label>Senha</label><input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password"></div>
     <button class="btn-login" id="btn-login" onclick="doLogin()">Entrar</button>
     <div class="login-err" id="l-err"></div>
-    <div style="font-size:10px;color:var(--txt3);margin-top:20px;text-align:center">dash.wave41.com.br · Acesso restrito</div>
+    <div style="font-size:10px;color:var(--txt3);margin-top:20px;text-align:center">dash.wave41.com.br · Acesso restrito <span class="vbadge">v3.1.0</span></div>
   </div>
 </div>
 
@@ -232,7 +232,7 @@ tbody td{padding:10px 14px;color:var(--txt);white-space:nowrap;max-width:180px;o
 
   <footer class="footer">
     <div class="foot-l">Operado por <strong>Trilha 41</strong> para <strong>Rodrigo Chociai · Ademicon</strong></div>
-    <div class="foot-r"><span id="last-upd">—</span><span class="vbadge">v3.0.0</span></div>
+    <div class="foot-r"><span id="last-upd">—</span><span class="vbadge">v3.1.0</span></div>
   </footer>
 </div>
 
@@ -241,17 +241,27 @@ const SURL = 'https://gpilasgpumovlmnsdycq.supabase.co'
 const SKEY = 'sb_publishable_Liymz5H6GqF6uNO1g9nD9A_UPfRCqn8'
 const REFRESH_SEC = 600
 
-const { createClient } = window.supabase
-const sb = createClient(SURL, SKEY)
+let sb, ALL = [], FILTERED = [], refreshTimer, cdTimer, cd = REFRESH_SEC
 
-let ALL = [], FILTERED = [], refreshTimer, cdTimer, cd = REFRESH_SEC
+window.addEventListener('load', () => {
+  try {
+    const { createClient } = window.supabase
+    sb = createClient(SURL, SKEY)
+    init()
+  } catch(e) {
+    console.error('Erro ao inicializar Supabase:', e)
+    const err = document.getElementById('l-err')
+    err.textContent = 'Erro ao carregar. Verifique sua conexão e recarregue a página.'
+    err.style.display = 'block'
+  }
+})
 
 // ── AUTH ──────────────────────────────────────────────────────
 async function init() {
   const { data: { session } } = await sb.auth.getSession()
   if (session) { showDash(session.user.email); loadData() }
-  document.getElementById('l-pass').onkeydown = e => e.key === 'Enter' && doLogin()
-  document.getElementById('l-email').onkeydown = e => e.key === 'Enter' && document.getElementById('l-pass').focus()
+  document.getElementById('l-pass').onkeydown = e => { if (e.key === 'Enter') doLogin() }
+  document.getElementById('l-email').onkeydown = e => { if (e.key === 'Enter') document.getElementById('l-pass').focus() }
 }
 
 async function doLogin() {
@@ -591,7 +601,6 @@ function resetCd() {
 
 function refresh() { resetCd(); loadData() }
 function spinning(v) { const btn = document.getElementById('btn-ref'); if (!btn) return; btn.classList.toggle('spin',v); btn.disabled=v }
-init()
 </script>
 </body>
 </html>
