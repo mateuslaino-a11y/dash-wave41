@@ -194,7 +194,7 @@ tbody td{padding:10px 14px;color:var(--txt);white-space:nowrap;max-width:180px;o
     <div class="fg"><label>Senha</label><input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password"></div>
     <button class="btn-login" id="btn-login" onclick="doLogin()">Entrar</button>
     <div class="login-err" id="l-err"></div>
-    <div style="font-size:10px;color:var(--txt3);margin-top:20px;text-align:center">dash.wave41.com.br · Acesso restrito <span class="vbadge">v3.1.0</span></div>
+    <div style="font-size:10px;color:var(--txt3);margin-top:20px;text-align:center">dash.wave41.com.br · Acesso restrito <span class="vbadge">v3.2.0</span></div>
   </div>
 </div>
 
@@ -232,7 +232,7 @@ tbody td{padding:10px 14px;color:var(--txt);white-space:nowrap;max-width:180px;o
 
   <footer class="footer">
     <div class="foot-l">Operado por <strong>Trilha 41</strong> para <strong>Rodrigo Chociai · Ademicon</strong></div>
-    <div class="foot-r"><span id="last-upd">—</span><span class="vbadge">v3.1.0</span></div>
+    <div class="foot-r"><span id="last-upd">—</span><span class="vbadge">v3.2.0</span></div>
   </footer>
 </div>
 
@@ -371,7 +371,7 @@ function renderDash() {
         <thead><tr>
           <th>Nome</th><th>Produto</th><th>Valor Sim.</th><th>Campanha</th>
           <th>Grupo</th><th>Status</th><th>Respondeu</th><th>Conversa</th>
-          <th>Interesse</th><th>Agendou</th><th>Compareceu</th><th>Erro</th>
+          <th>Interesse</th><th>Qualificado</th><th>Compareceu</th><th>Erro</th>
         </tr></thead>
         <tbody id="leads-tbody"></tbody>
       </table></div>
@@ -407,7 +407,7 @@ function renderKpis() {
   document.getElementById('kpi-row').innerHTML = [
     kc('Total na Base',    total,       'azul',     'ca', `${ativos} ativos · ${perdidos} perdidos`),
     kc('Responderam',      respondeu,   'verde',    'cv', `${txResp}% dos entregues`),
-    kc('Agendamentos',     agendou,     agendou>0?'roxo':'', 'cp', `${compareceu} comparecimento(s)`),
+    kc('Lead Qualificado', agendou,     agendou>0?'roxo':'', 'cp', `${compareceu} comparecimento(s)`),
     kc('Erro no Envio',    erros,       erros>0?'vermelho':'', 'cr', `${contatados>0?Math.round(erros/contatados*100):0}% dos contatados`),
     kc('Taxa Resposta',    txResp+'%',  txResp>=20?'verde':txResp>=10?'amarelo':'vermelho', 'cam', 'sobre entregues'),
     kc('Valor Fechado',    valorFechado>0?'R$ '+Number(valorFechado).toLocaleString('pt-BR',{maximumFractionDigits:0}):'R$ 0', valorFechado>0?'ouro':'', 'co', valorFechado>0?'em crédito fechado':'nenhum fechamento ainda'),
@@ -440,8 +440,8 @@ function renderFunil() {
     { label:'Responderam',        val:respondeu,  cor:'linear-gradient(90deg,#3DBD88,#50D4A0)', div:false },
     { label:'Em conversa',        val:conversa,   cor:'linear-gradient(90deg,#F0A952,#F5C280)', div:false },
     { label:'Interesse mapeado',  val:interesse,  cor:'linear-gradient(90deg,#F0A952,#E89540)', div:true  },
-    { label:'Reunião agendada',   val:agendou,    cor:'linear-gradient(90deg,#9B59B6,#B07CC6)', div:false },
-    { label:'Reunião realizada',  val:compareceu, cor:'linear-gradient(90deg,#3DBD88,#2DA070)', div:false },
+    { label:'Lead qualificado',   val:agendou,    cor:'linear-gradient(90deg,#9B59B6,#B07CC6)', div:false },
+    { label:'Compareceu (reunião/oport.)', val:compareceu, cor:'linear-gradient(90deg,#3DBD88,#2DA070)', div:false },
   ].map((s,i) => `
     <div class="fr">
       <div class="flbl">${s.label}</div>
@@ -516,7 +516,7 @@ function renderCampanhas() {
         ${metric(respondeu,   'Responderam',  txResp+'%',  'var(--verde)')}
         ${metric(erros,       'Erro envio',   txErro+'%',  'var(--vermelho)')}
         ${metric(perdidos,    'Perdidos',     txPerda+'%', 'var(--txt2)')}
-        ${metric(agendou,     'Agendamentos', agendou+'', 'var(--roxo)')}
+        ${metric(agendou,     'Qualificados', agendou+'', 'var(--roxo)')}
         ${metric(entregues,   'Entregues',    entregues+'','var(--azul-cl)')}
       </div>
     </div>`
