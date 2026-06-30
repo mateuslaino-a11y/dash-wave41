@@ -157,6 +157,54 @@ tbody td{padding:10px 14px;color:var(--txt);white-space:nowrap;max-width:180px;o
 .bp{background:var(--roxo-bg);color:var(--roxo);border:1px solid rgba(155,89,182,.2)}
 .empty{text-align:center;padding:40px;color:var(--txt3);font-size:13px}
 
+/* CLICKABLE ROW */
+tbody tr.clickable{cursor:pointer}
+tbody tr.clickable:hover{background:var(--surface3)}
+
+/* PAGINATION */
+.pagination{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--surface2);border-top:1px solid var(--borda)}
+.pag-info{font-size:11px;color:var(--txt3)}
+.pag-controls{display:flex;align-items:center;gap:8px}
+.pag-btn{background:var(--surface);border:1px solid var(--borda);color:var(--txt);border-radius:6px;padding:6px 12px;font-family:var(--font);font-size:11px;font-weight:600;cursor:pointer;transition:all .2s}
+.pag-btn:hover:not(:disabled){border-color:var(--azul-cl);color:var(--azul-cl)}
+.pag-btn:disabled{opacity:.3;cursor:not-allowed}
+.pag-current{font-size:11px;color:var(--txt2);padding:0 8px;font-weight:600}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px;backdrop-filter:blur(3px)}
+.modal-overlay.show{display:flex}
+.modal{background:var(--surface);border:1px solid var(--borda);border-radius:14px;max-width:780px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.modal-hdr{padding:22px 26px 18px;border-bottom:1px solid var(--borda);display:flex;align-items:flex-start;justify-content:space-between;gap:16px;position:sticky;top:0;background:var(--surface);z-index:1}
+.modal-hdr-l{flex:1;min-width:0}
+.modal-title{font-size:18px;font-weight:800;letter-spacing:-.3px;margin-bottom:6px;word-break:break-word}
+.modal-sub{font-size:12px;color:var(--txt2);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.modal-close{background:var(--surface2);border:1px solid var(--borda);color:var(--txt2);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.modal-close:hover{border-color:var(--vermelho);color:var(--vermelho)}
+.modal-body{padding:22px 26px}
+.modal-section{margin-bottom:24px}
+.modal-section:last-child{margin-bottom:0}
+.modal-section-title{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--txt3);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--borda)}
+.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal-field{display:flex;flex-direction:column;gap:3px}
+.modal-field.full{grid-column:1/-1}
+.modal-field-lbl{font-size:10px;font-weight:600;color:var(--txt3);letter-spacing:.3px;text-transform:uppercase}
+.modal-field-val{font-size:13px;color:var(--txt);font-weight:500;word-break:break-word}
+.modal-field-val.empty{color:var(--txt3);font-weight:400;font-style:italic}
+.modal-field-val a{color:var(--azul-cl);text-decoration:none}
+.modal-field-val a:hover{text-decoration:underline}
+.modal-timeline{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.timeline-item{background:var(--surface2);border:1px solid var(--borda);border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px}
+.timeline-item.done{border-color:rgba(61,189,136,.3);background:rgba(61,189,136,.08)}
+.timeline-icon{font-size:14px;flex-shrink:0}
+.timeline-text{font-size:11px;color:var(--txt2);font-weight:500}
+.timeline-item.done .timeline-text{color:var(--verde)}
+
+@media(max-width:600px){
+  .modal-grid{grid-template-columns:1fr}
+  .modal-hdr{padding:18px 20px}
+  .modal-body{padding:18px 20px}
+}
+
 /* LOADING */
 .loading{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:60px;color:var(--txt2);font-size:13px}
 .loader{width:32px;height:32px;border:2px solid var(--surface3);border-top-color:var(--azul);border-radius:50%;animation:spin .7s linear infinite}
@@ -194,7 +242,7 @@ tbody td{padding:10px 14px;color:var(--txt);white-space:nowrap;max-width:180px;o
     <div class="fg"><label>Senha</label><input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password"></div>
     <button class="btn-login" id="btn-login" onclick="doLogin()">Entrar</button>
     <div class="login-err" id="l-err"></div>
-    <div style="font-size:10px;color:var(--txt3);margin-top:20px;text-align:center">dash.wave41.com.br · Acesso restrito <span class="vbadge">v3.3.0</span></div>
+    <div style="font-size:10px;color:var(--txt3);margin-top:20px;text-align:center">dash.wave41.com.br · Acesso restrito <span class="vbadge">v3.4.0</span></div>
   </div>
 </div>
 
@@ -232,8 +280,13 @@ tbody td{padding:10px 14px;color:var(--txt);white-space:nowrap;max-width:180px;o
 
   <footer class="footer">
     <div class="foot-l">Operado por <strong>Trilha 41</strong> para <strong>Rodrigo Chociai · Ademicon</strong></div>
-    <div class="foot-r"><span id="last-upd">—</span><span class="vbadge">v3.3.0</span></div>
+    <div class="foot-r"><span id="last-upd">—</span><span class="vbadge">v3.4.0</span></div>
   </footer>
+</div>
+
+<!-- MODAL DETALHE DO LEAD -->
+<div class="modal-overlay" id="lead-modal" onclick="if(event.target===this)closeLeadModal()">
+  <div class="modal" id="lead-modal-content"></div>
 </div>
 
 <script>
@@ -244,6 +297,8 @@ const REFRESH_SEC = 600
 let sb, ALL = [], FILTERED = [], refreshTimer, cdTimer, cd = REFRESH_SEC
 let QUICK_FILTER = null
 let FIELD_FILTER  = null
+let CURRENT_PAGE  = 0
+const PAGE_SIZE   = 50
 
 window.addEventListener('load', () => {
   try {
@@ -354,6 +409,7 @@ function quickFilterCampanha(camp, metricKey) {
 
 // ── FILTERS ───────────────────────────────────────────────────
 function applyFilters() {
+  CURRENT_PAGE = 0
   const camp = document.getElementById('f-camp').value
   const q    = document.getElementById('f-search').value.trim().toLowerCase()
   const qfDef = QUICK_FILTER ? QF_DEFS[QUICK_FILTER] : null
@@ -432,7 +488,7 @@ function renderDash() {
       <div class="sh"><span class="st">Comparativo por Campanha</span><span class="sm">Respostas, perdas e engajamento</span></div>
       <div class="camp-grid" id="camp-grid"></div>
     </div>
-    <div class="sh"><span class="st">Todos os Leads</span></div>
+    <div class="sh"><span class="st">Todos os Leads</span><span class="sm" id="leads-count"></span></div>
     <div class="tcard">
       <div class="tscroll"><table>
         <thead><tr>
@@ -442,6 +498,7 @@ function renderDash() {
         </tr></thead>
         <tbody id="leads-tbody"></tbody>
       </table></div>
+      <div class="pagination" id="pagination"></div>
     </div>
   `
   renderAll()
@@ -592,15 +649,33 @@ function renderCampanhas() {
   }).join('')
 }
 
-// ── TABLE ─────────────────────────────────────────────────────
+// ── TABLE + PAGINAÇÃO ─────────────────────────────────────────
 function renderTable() {
   const tbody = document.getElementById('leads-tbody')
+  const pag   = document.getElementById('pagination')
+  const count = document.getElementById('leads-count')
   if (!tbody) return
-  if (!FILTERED.length) { tbody.innerHTML = `<tr><td colspan="12" class="empty">Nenhum lead encontrado.</td></tr>`; return }
 
-  tbody.innerHTML = FILTERED.slice(0, 300).map(l => {
+  if (!FILTERED.length) {
+    tbody.innerHTML = `<tr><td colspan="12" class="empty">Nenhum lead encontrado.</td></tr>`
+    if (pag) pag.innerHTML = ''
+    if (count) count.textContent = ''
+    return
+  }
+
+  const totalPages = Math.max(1, Math.ceil(FILTERED.length / PAGE_SIZE))
+  if (CURRENT_PAGE >= totalPages) CURRENT_PAGE = totalPages - 1
+  if (CURRENT_PAGE < 0) CURRENT_PAGE = 0
+
+  const start = CURRENT_PAGE * PAGE_SIZE
+  const end   = Math.min(start + PAGE_SIZE, FILTERED.length)
+  const slice = FILTERED.slice(start, end)
+
+  if (count) count.textContent = `${FILTERED.length} leads · página ${CURRENT_PAGE + 1} de ${totalPages}`
+
+  tbody.innerHTML = slice.map(l => {
     const valor = l.valor_simulacao ? `R$ ${Number(l.valor_simulacao).toLocaleString('pt-BR',{maximumFractionDigits:0})}` : '—'
-    return `<tr>
+    return `<tr class="clickable" onclick="openLeadModal('${l.lead_id}')">
       <td class="td-name">${l.lead_name || '—'}</td>
       <td>${l.produto ? `<span class="badge ba">${l.produto}</span>` : '—'}</td>
       <td style="font-weight:600">${valor}</td>
@@ -615,7 +690,172 @@ function renderTable() {
       <td style="text-align:center">${(l.erro_envio||l.status==='Erro no envio') ? '❌' : '—'}</td>
     </tr>`
   }).join('')
+
+  if (pag) {
+    pag.innerHTML = `
+      <div class="pag-info">Mostrando ${start + 1}–${end} de ${FILTERED.length}</div>
+      <div class="pag-controls">
+        <button class="pag-btn" onclick="goToPage(0)"        ${CURRENT_PAGE === 0 ? 'disabled' : ''}>«</button>
+        <button class="pag-btn" onclick="goToPage(CURRENT_PAGE-1)" ${CURRENT_PAGE === 0 ? 'disabled' : ''}>Anterior</button>
+        <span class="pag-current">${CURRENT_PAGE + 1} / ${totalPages}</span>
+        <button class="pag-btn" onclick="goToPage(CURRENT_PAGE+1)" ${CURRENT_PAGE >= totalPages - 1 ? 'disabled' : ''}>Próxima</button>
+        <button class="pag-btn" onclick="goToPage(${totalPages - 1})" ${CURRENT_PAGE >= totalPages - 1 ? 'disabled' : ''}>»</button>
+      </div>
+    `
+  }
 }
+
+function goToPage(p) {
+  CURRENT_PAGE = p
+  renderTable()
+  document.querySelector('.tcard')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
+// ── MODAL DETALHE DO LEAD ─────────────────────────────────────
+function openLeadModal(leadId) {
+  const lead = ALL.find(l => l.lead_id === leadId)
+  if (!lead) return
+
+  const fmt = (v, empty = '—') => v == null || v === '' ? `<span class="modal-field-val empty">${empty}</span>` : v
+  const fmtDate = v => {
+    if (!v) return `<span class="modal-field-val empty">não preenchido</span>`
+    try {
+      const d = new Date(v)
+      return d.toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' })
+    } catch { return v }
+  }
+  const fmtMoney = v => v ? `R$ ${Number(v).toLocaleString('pt-BR',{maximumFractionDigits:2})}` : `<span class="modal-field-val empty">—</span>`
+  const fmtPhone = v => {
+    if (!v) return `<span class="modal-field-val empty">não preenchido</span>`
+    const clean = String(v).replace(/\D/g,'')
+    return `<a href="https://wa.me/${clean}" target="_blank" rel="noopener">${v}</a>`
+  }
+  const fmtEmail = v => v ? `<a href="mailto:${v}">${v}</a>` : `<span class="modal-field-val empty">não preenchido</span>`
+
+  const timelineItem = (label, done, icon) => `
+    <div class="timeline-item ${done ? 'done' : ''}">
+      <span class="timeline-icon">${done ? '✅' : '⚪'}</span>
+      <span class="timeline-text">${label}</span>
+    </div>`
+
+  const content = `
+    <div class="modal-hdr">
+      <div class="modal-hdr-l">
+        <div class="modal-title">${lead.lead_name || 'Lead sem nome'}</div>
+        <div class="modal-sub">
+          <span class="badge ${statusBadge(lead)}">${lead.status || 'Sem status'}</span>
+          ${lead.produto ? `<span class="badge ba">${lead.produto}</span>` : ''}
+          ${lead.grupo_teste ? `<span class="badge bam">Grupo ${lead.grupo_teste}</span>` : ''}
+          <span style="color:var(--txt3)">ID ${lead.lead_id}</span>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeLeadModal()" title="Fechar">✕</button>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="modal-section">
+        <div class="modal-section-title">Contato</div>
+        <div class="modal-grid">
+          <div class="modal-field"><span class="modal-field-lbl">Nome do contato</span><span class="modal-field-val">${fmt(lead.contato_nome, 'não preenchido')}</span></div>
+          <div class="modal-field"><span class="modal-field-lbl">Telefone</span><span class="modal-field-val">${fmtPhone(lead.telefone)}</span></div>
+          <div class="modal-field full"><span class="modal-field-lbl">E-mail</span><span class="modal-field-val">${fmtEmail(lead.email)}</span></div>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-title">Campanha e Produto</div>
+        <div class="modal-grid">
+          <div class="modal-field full"><span class="modal-field-lbl">Campanha</span><span class="modal-field-val">${fmt(lead.campanha)}</span></div>
+          <div class="modal-field"><span class="modal-field-lbl">Valor simulação</span><span class="modal-field-val">${fmtMoney(lead.valor_simulacao)}</span></div>
+          <div class="modal-field"><span class="modal-field-lbl">Valor fechado</span><span class="modal-field-val">${fmtMoney(lead.valor_fechado)}</span></div>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-title">Etapas do Funil</div>
+        <div class="modal-timeline">
+          ${timelineItem('Contatado',      lead.status !== 'Etapa de leads de entrada', '📨')}
+          ${timelineItem('Respondeu',      lead.houve_resposta, '💬')}
+          ${timelineItem('Em conversa',    lead.em_conversa, '🗨️')}
+          ${timelineItem('Interesse',      lead.interesse_mapeado, '⭐')}
+          ${timelineItem('Qualificado',    lead.houve_agendamento || lead.reuniao_agendada, '📅')}
+          ${timelineItem('Compareceu',     lead.reuniao_realizada, '✅')}
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-title">Datas da Cadência</div>
+        <div class="modal-grid">
+          <div class="modal-field"><span class="modal-field-lbl">D1 enviado</span><span class="modal-field-val">${fmtDate(lead.data_d1)}</span></div>
+          <div class="modal-field"><span class="modal-field-lbl">D3 enviado</span><span class="modal-field-val">${fmtDate(lead.data_d3)}</span></div>
+          <div class="modal-field"><span class="modal-field-lbl">D7 enviado</span><span class="modal-field-val">${fmtDate(lead.data_d7)}</span></div>
+          <div class="modal-field"><span class="modal-field-lbl">Primeira resposta</span><span class="modal-field-val">${fmtDate(lead.data_primeira_resposta)}</span></div>
+          <div class="modal-field"><span class="modal-field-lbl">Reunião agendada</span><span class="modal-field-val">${fmtDate(lead.data_reuniao)}</span></div>
+          <div class="modal-field"><span class="modal-field-lbl">Reunião realizada</span><span class="modal-field-val">${fmtDate(lead.data_reuniao_realizada)}</span></div>
+        </div>
+      </div>
+
+      ${(lead.erro_envio || lead.status === 'Erro no envio' || lead.motivo_erro) ? `
+        <div class="modal-section">
+          <div class="modal-section-title">Erro no Envio</div>
+          <div class="modal-grid">
+            <div class="modal-field"><span class="modal-field-lbl">Data do erro</span><span class="modal-field-val">${fmtDate(lead.data_erro_envio)}</span></div>
+            <div class="modal-field"><span class="modal-field-lbl">Motivo do erro</span><span class="modal-field-val">${fmt(lead.motivo_erro)}</span></div>
+            <div class="modal-field"><span class="modal-field-lbl">Número verificado?</span><span class="modal-field-val">${lead.numero_verificado ? '✅ Sim' : '—'}</span></div>
+            <div class="modal-field"><span class="modal-field-lbl">Data do reenvio</span><span class="modal-field-val">${fmtDate(lead.data_reenvio)}</span></div>
+            <div class="modal-field"><span class="modal-field-lbl">Resultado do reenvio</span><span class="modal-field-val">${fmt(lead.resultado_reenvio)}</span></div>
+            <div class="modal-field"><span class="modal-field-lbl">Tentativas de contato</span><span class="modal-field-val">${fmt(lead.tentativas_contato)}</span></div>
+          </div>
+        </div>
+      ` : ''}
+
+      ${lead.is_perdido ? `
+        <div class="modal-section">
+          <div class="modal-section-title">Lead Perdido</div>
+          <div class="modal-grid">
+            <div class="modal-field full"><span class="modal-field-lbl">Motivo da perda</span><span class="modal-field-val">${fmt(lead.motivo_perda)}</span></div>
+          </div>
+        </div>
+      ` : ''}
+
+      ${lead.reuniao_realizada || lead.score_reuniao ? `
+        <div class="modal-section">
+          <div class="modal-section-title">Avaliação da Reunião</div>
+          <div class="modal-grid">
+            <div class="modal-field"><span class="modal-field-lbl">Score</span><span class="modal-field-val">${fmt(lead.score_reuniao)}</span></div>
+            <div class="modal-field"><span class="modal-field-lbl">Compareceu</span><span class="modal-field-val">${lead.reuniao_realizada ? '✅ Sim' : '— Não'}</span></div>
+          </div>
+        </div>
+      ` : ''}
+
+      <div class="modal-section">
+        <div class="modal-section-title">Sistema</div>
+        <div class="modal-grid">
+          <div class="modal-field"><span class="modal-field-lbl">Lead criado</span><span class="modal-field-val">${fmtDate(lead.criado_em)}</span></div>
+          <div class="modal-field"><span class="modal-field-lbl">Última atualização</span><span class="modal-field-val">${fmtDate(lead.atualizado_em)}</span></div>
+          <div class="modal-field"><span class="modal-field-lbl">Sincronizado em</span><span class="modal-field-val">${fmtDate(lead.synced_at)}</span></div>
+          <div class="modal-field"><span class="modal-field-lbl">Opt-out LGPD</span><span class="modal-field-val">${lead.opt_out_lgpd ? '⚠️ Sim — não contatar' : '— Não'}</span></div>
+        </div>
+      </div>
+
+    </div>
+  `
+
+  document.getElementById('lead-modal-content').innerHTML = content
+  document.getElementById('lead-modal').classList.add('show')
+  document.body.style.overflow = 'hidden'
+}
+
+function closeLeadModal() {
+  document.getElementById('lead-modal').classList.remove('show')
+  document.body.style.overflow = ''
+}
+
+// Esc fecha o modal
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeLeadModal()
+})
 
 function shortCamp(c) {
   if (!c) return '—'
