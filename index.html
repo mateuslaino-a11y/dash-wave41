@@ -194,7 +194,7 @@ tbody td{padding:10px 14px;color:var(--txt);white-space:nowrap;max-width:180px;o
     <div class="fg"><label>Senha</label><input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password"></div>
     <button class="btn-login" id="btn-login" onclick="doLogin()">Entrar</button>
     <div class="login-err" id="l-err"></div>
-    <div style="font-size:10px;color:var(--txt3);margin-top:20px;text-align:center">dash.wave41.com.br · Acesso restrito <span class="vbadge">v3.2.0</span></div>
+    <div style="font-size:10px;color:var(--txt3);margin-top:20px;text-align:center">dash.wave41.com.br · Acesso restrito <span class="vbadge">v3.3.0</span></div>
   </div>
 </div>
 
@@ -232,7 +232,7 @@ tbody td{padding:10px 14px;color:var(--txt);white-space:nowrap;max-width:180px;o
 
   <footer class="footer">
     <div class="foot-l">Operado por <strong>Trilha 41</strong> para <strong>Rodrigo Chociai · Ademicon</strong></div>
-    <div class="foot-r"><span id="last-upd">—</span><span class="vbadge">v3.2.0</span></div>
+    <div class="foot-r"><span id="last-upd">—</span><span class="vbadge">v3.3.0</span></div>
   </footer>
 </div>
 
@@ -242,6 +242,8 @@ const SKEY = 'sb_publishable_Liymz5H6GqF6uNO1g9nD9A_UPfRCqn8'
 const REFRESH_SEC = 600
 
 let sb, ALL = [], FILTERED = [], refreshTimer, cdTimer, cd = REFRESH_SEC
+let QUICK_FILTER = null
+let FIELD_FILTER  = null
 
 window.addEventListener('load', () => {
   try {
@@ -322,24 +324,89 @@ function populateCampanhas() {
   camps.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = shortCamp(c); sel.appendChild(o) })
 }
 
+// ── QUICK FILTERS (clique em KPI / funil / campanha) ───────────
+const QF_DEFS = {
+  total:      { label: 'Total na base',         test: l => true },
+  ativos:     { label: 'Ativos (não perdidos)', test: l => !l.is_perdido },
+  perdidos:   { label: 'Perdidos',               test: l => l.is_perdido },
+  respondeu:  { label: 'Responderam',            test: l => l.houve_resposta },
+  conversa:   { label: 'Em conversa',            test: l => l.em_conversa },
+  interesse:  { label: 'Interesse mapeado',      test: l => l.interesse_mapeado },
+  qualificado:{ label: 'Lead qualificado',       test: l => l.houve_agendamento || l.reuniao_agendada },
+  compareceu: { label: 'Compareceu (reunião/oport.)', test: l => l.reuniao_realizada },
+  erro:       { label: 'Erro no envio',          test: l => l.erro_envio || l.status === 'Erro no envio' },
+  contatados: { label: 'Contatados',             test: l => l.status !== 'Etapa de leads de entrada' },
+  entregues:  { label: 'Entregues',              test: l => l.status !== 'Etapa de leads de entrada' && !(l.erro_envio || l.status === 'Erro no envio') },
+}
+
+function toggleQuickFilter(key) {
+  QUICK_FILTER = (QUICK_FILTER === key) ? null : key
+  FIELD_FILTER = null
+  applyFilters()
+}
+
+function quickFilterCampanha(camp, metricKey) {
+  document.getElementById('f-camp').value = camp
+  QUICK_FILTER = metricKey
+  FIELD_FILTER = null
+  applyFilters()
+}
+
 // ── FILTERS ───────────────────────────────────────────────────
 function applyFilters() {
   const camp = document.getElementById('f-camp').value
   const q    = document.getElementById('f-search').value.trim().toLowerCase()
+  const qfDef = QUICK_FILTER ? QF_DEFS[QUICK_FILTER] : null
+
   FILTERED = ALL.filter(l => {
     const mc = !camp || l.campanha === camp
     const mq = !q || [l.lead_name, l.produto, l.campanha, l.grupo_teste, l.status, l.motivo_perda, l.lead_id]
       .some(f => (f || '').toLowerCase().includes(q))
-    return mc && mq
+    const mqf = !qfDef || qfDef.test(l)
+    const mff = !FIELD_FILTER || (l[FIELD_FILTER.field] || (FIELD_FILTER.field === 'motivo_perda' ? 'Não especificado' : 'Sem status')) === FIELD_FILTER.value
+    return mc && mq && mqf && mff
   })
+
   document.getElementById('res-count').textContent =
-    (camp || q) ? `${FILTERED.length} de ${ALL.length} leads` : `${ALL.length} leads`
+    (camp || q || QUICK_FILTER || FIELD_FILTER) ? `${FILTERED.length} de ${ALL.length} leads` : `${ALL.length} leads`
+
+  renderQuickFilterChip()
   if (document.getElementById('kpi-row')) renderAll()
+}
+
+function renderQuickFilterChip() {
+  const existing = document.getElementById('qf-chip')
+  if (existing) existing.remove()
+  let label = null
+  if (QUICK_FILTER && QF_DEFS[QUICK_FILTER]) label = QF_DEFS[QUICK_FILTER].label
+  if (FIELD_FILTER) label = FIELD_FILTER.value
+  if (!label) return
+  const chip = document.createElement('span')
+  chip.id = 'qf-chip'
+  chip.style.cssText = 'display:flex;align-items:center;gap:6px;background:var(--azul);color:#fff;font-size:11px;font-weight:700;padding:5px 8px 5px 12px;border-radius:20px;white-space:nowrap'
+  chip.innerHTML = `Filtro: ${label} <span style="cursor:pointer;opacity:.8;font-size:13px;padding:0 2px" onclick="clearQuickFilter()">✕</span>`
+  const bar = document.querySelector('.filters')
+  if (bar) bar.insertBefore(chip, document.getElementById('res-count'))
+}
+
+function quickFilterField(field, value) {
+  const isSame = FIELD_FILTER && FIELD_FILTER.field === field && FIELD_FILTER.value === value
+  FIELD_FILTER = isSame ? null : { field, value }
+  QUICK_FILTER = null
+  applyFilters()
+}
+
+function clearQuickFilter() {
+  QUICK_FILTER = null
+  FIELD_FILTER = null
+  applyFilters()
 }
 
 function resetFilters() {
   document.getElementById('f-camp').value = ''
   document.getElementById('f-search').value = ''
+  QUICK_FILTER = null
+  FIELD_FILTER = null
   applyFilters()
 }
 
@@ -405,17 +472,19 @@ function renderKpis() {
   const txResp      = entregues > 0 ? Math.round(respondeu / entregues * 100) : 0
 
   document.getElementById('kpi-row').innerHTML = [
-    kc('Total na Base',    total,       'azul',     'ca', `${ativos} ativos · ${perdidos} perdidos`),
-    kc('Responderam',      respondeu,   'verde',    'cv', `${txResp}% dos entregues`),
-    kc('Lead Qualificado', agendou,     agendou>0?'roxo':'', 'cp', `${compareceu} comparecimento(s)`),
-    kc('Erro no Envio',    erros,       erros>0?'vermelho':'', 'cr', `${contatados>0?Math.round(erros/contatados*100):0}% dos contatados`),
-    kc('Taxa Resposta',    txResp+'%',  txResp>=20?'verde':txResp>=10?'amarelo':'vermelho', 'cam', 'sobre entregues'),
-    kc('Valor Fechado',    valorFechado>0?'R$ '+Number(valorFechado).toLocaleString('pt-BR',{maximumFractionDigits:0}):'R$ 0', valorFechado>0?'ouro':'', 'co', valorFechado>0?'em crédito fechado':'nenhum fechamento ainda'),
+    kc('Total na Base',    total,       'azul',     'ca', `${ativos} ativos · ${perdidos} perdidos`, 'total'),
+    kc('Responderam',      respondeu,   'verde',    'cv', `${txResp}% dos entregues`, 'respondeu'),
+    kc('Lead Qualificado', agendou,     agendou>0?'roxo':'', 'cp', `${compareceu} comparecimento(s)`, 'qualificado'),
+    kc('Erro no Envio',    erros,       erros>0?'vermelho':'', 'cr', `${contatados>0?Math.round(erros/contatados*100):0}% dos contatados`, 'erro'),
+    kc('Taxa Resposta',    txResp+'%',  txResp>=20?'verde':txResp>=10?'amarelo':'vermelho', 'cam', 'sobre entregues', 'respondeu'),
+    kc('Valor Fechado',    valorFechado>0?'R$ '+Number(valorFechado).toLocaleString('pt-BR',{maximumFractionDigits:0}):'R$ 0', valorFechado>0?'ouro':'', 'co', valorFechado>0?'em crédito fechado':'nenhum fechamento ainda', null),
   ].join('')
 }
 
-function kc(label, val, cls, card, detail) {
-  return `<div class="kc ${card}"><div class="kl">${label}</div><div class="kn ${cls}">${val}</div><div class="kd">${detail}</div></div>`
+function kc(label, val, cls, card, detail, qfKey) {
+  const active = (qfKey && QUICK_FILTER === qfKey) ? 'box-shadow:inset 0 0 0 1.5px var(--azul-cl);' : ''
+  const attrs  = qfKey ? `style="cursor:pointer;${active}" onclick="toggleQuickFilter('${qfKey}')" title="Clique para filtrar"` : ''
+  return `<div class="kc ${card}" ${attrs}><div class="kl">${label}</div><div class="kn ${cls}">${val}</div><div class="kd">${detail}</div></div>`
 }
 
 // ── FUNIL ─────────────────────────────────────────────────────
@@ -434,16 +503,16 @@ function renderFunil() {
 
   document.getElementById('funil-meta').textContent = `${L.length} leads · ${new Date().toLocaleDateString('pt-BR')}`
   document.getElementById('funil-grid').innerHTML = [
-    { label:'Total importados',   val:total,      cor:'linear-gradient(90deg,#6B7FE0,#8090E8)', div:false },
-    { label:'Contatados',         val:contatados, cor:'linear-gradient(90deg,#5068D4,#6B7FE0)', div:false },
-    { label:'Entregues',          val:entregues,  cor:'linear-gradient(90deg,#3B55CC,#5068D4)', div:true  },
-    { label:'Responderam',        val:respondeu,  cor:'linear-gradient(90deg,#3DBD88,#50D4A0)', div:false },
-    { label:'Em conversa',        val:conversa,   cor:'linear-gradient(90deg,#F0A952,#F5C280)', div:false },
-    { label:'Interesse mapeado',  val:interesse,  cor:'linear-gradient(90deg,#F0A952,#E89540)', div:true  },
-    { label:'Lead qualificado',   val:agendou,    cor:'linear-gradient(90deg,#9B59B6,#B07CC6)', div:false },
-    { label:'Compareceu (reunião/oport.)', val:compareceu, cor:'linear-gradient(90deg,#3DBD88,#2DA070)', div:false },
+    { label:'Total importados',   val:total,      cor:'linear-gradient(90deg,#6B7FE0,#8090E8)', div:false, qf:'total' },
+    { label:'Contatados',         val:contatados, cor:'linear-gradient(90deg,#5068D4,#6B7FE0)', div:false, qf:'contatados' },
+    { label:'Entregues',          val:entregues,  cor:'linear-gradient(90deg,#3B55CC,#5068D4)', div:true,  qf:'entregues' },
+    { label:'Responderam',        val:respondeu,  cor:'linear-gradient(90deg,#3DBD88,#50D4A0)', div:false, qf:'respondeu' },
+    { label:'Em conversa',        val:conversa,   cor:'linear-gradient(90deg,#F0A952,#F5C280)', div:false, qf:'conversa' },
+    { label:'Interesse mapeado',  val:interesse,  cor:'linear-gradient(90deg,#F0A952,#E89540)', div:true,  qf:'interesse' },
+    { label:'Lead qualificado',   val:agendou,    cor:'linear-gradient(90deg,#9B59B6,#B07CC6)', div:false, qf:'qualificado' },
+    { label:'Compareceu (reunião/oport.)', val:compareceu, cor:'linear-gradient(90deg,#3DBD88,#2DA070)', div:false, qf:'compareceu' },
   ].map((s,i) => `
-    <div class="fr">
+    <div class="fr" style="cursor:pointer;${QUICK_FILTER===s.qf?'background:rgba(59,85,204,.08);border-radius:6px':''}" onclick="toggleQuickFilter('${s.qf}')" title="Clique para filtrar">
       <div class="flbl">${s.label}</div>
       <div class="fbw"><div class="fb" style="background:${s.cor};width:${(s.val/total*100).toFixed(1)}%"><span class="pct">${(s.val/total*100).toFixed(0)}%</span></div></div>
       <div class="fv">${s.val}</div>
@@ -462,7 +531,7 @@ function renderPerdidos() {
   document.getElementById('perd-total').textContent = `${perdidos.length} perdidos`
   document.getElementById('perdidos-list').innerHTML = sorted.length
     ? sorted.map(([motivo, n]) => `
-        <div class="motivo-row">
+        <div class="motivo-row" style="cursor:pointer;${FIELD_FILTER && FIELD_FILTER.field==='motivo_perda' && FIELD_FILTER.value===motivo ? 'background:rgba(232,90,79,.08);border-radius:6px' : ''}" onclick="quickFilterField('motivo_perda', ${JSON.stringify(motivo)})" title="Clique para filtrar">
           <div class="motivo-label" title="${motivo}">${motivo}</div>
           <div class="motivo-bar-wrap"><div class="motivo-bar" style="background:var(--vermelho);width:${n/maxVal*100}%"></div></div>
           <div class="motivo-val">${n}</div>
@@ -477,7 +546,7 @@ function renderStatusList() {
   const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1])
   const maxVal = sorted[0]?.[1] || 1
   document.getElementById('status-list').innerHTML = sorted.map(([s, n]) => `
-    <div class="motivo-row">
+    <div class="motivo-row" style="cursor:pointer;${FIELD_FILTER && FIELD_FILTER.field==='status' && FIELD_FILTER.value===s ? 'background:rgba(59,85,204,.08);border-radius:6px' : ''}" onclick="quickFilterField('status', ${JSON.stringify(s)})" title="Clique para filtrar">
       <div class="motivo-label">${s}</div>
       <div class="motivo-bar-wrap"><div class="motivo-bar" style="background:var(--azul-cl);width:${n/maxVal*100}%"></div></div>
       <div class="motivo-val">${n}</div>
@@ -502,8 +571,8 @@ function renderCampanhas() {
     const txPerda   = total > 0 ? Math.round(perdidos / total * 100) : 0
     const txErro    = contat > 0 ? Math.round(erros / contat * 100) : 0
 
-    const metric = (val, lbl, pct, cor) => `
-      <div class="camp-metric">
+    const metric = (val, lbl, pct, cor, qfKey) => `
+      <div class="camp-metric" style="cursor:pointer" onclick="quickFilterCampanha('${camp.replace(/'/g,"\\'")}','${qfKey}')" title="Clique para filtrar ${shortCamp(camp)} · ${lbl}">
         <div class="val" style="color:${cor}">${val}</div>
         <div class="lbl">${lbl}</div>
         <div class="pct" style="color:${cor};opacity:.7">${pct}</div>
@@ -513,11 +582,11 @@ function renderCampanhas() {
     return `<div class="camp-row">
       <div class="camp-name">${shortCamp(camp)}<span class="total">${total} leads</span></div>
       <div class="camp-metrics">
-        ${metric(respondeu,   'Responderam',  txResp+'%',  'var(--verde)')}
-        ${metric(erros,       'Erro envio',   txErro+'%',  'var(--vermelho)')}
-        ${metric(perdidos,    'Perdidos',     txPerda+'%', 'var(--txt2)')}
-        ${metric(agendou,     'Qualificados', agendou+'', 'var(--roxo)')}
-        ${metric(entregues,   'Entregues',    entregues+'','var(--azul-cl)')}
+        ${metric(respondeu,   'Responderam',  txResp+'%',  'var(--verde)', 'respondeu')}
+        ${metric(erros,       'Erro envio',   txErro+'%',  'var(--vermelho)', 'erro')}
+        ${metric(perdidos,    'Perdidos',     txPerda+'%', 'var(--txt2)', 'perdidos')}
+        ${metric(agendou,     'Qualificados', agendou+'', 'var(--roxo)', 'qualificado')}
+        ${metric(entregues,   'Entregues',    entregues+'','var(--azul-cl)', 'entregues')}
       </div>
     </div>`
   }).join('')
