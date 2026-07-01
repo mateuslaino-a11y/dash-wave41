@@ -242,7 +242,7 @@ tbody tr.clickable:hover{background:var(--surface3)}
     <div class="fg"><label>Senha</label><input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password"></div>
     <button class="btn-login" id="btn-login" onclick="doLogin()">Entrar</button>
     <div class="login-err" id="l-err"></div>
-    <div style="font-size:10px;color:var(--txt3);margin-top:20px;text-align:center">dash.wave41.com.br · Acesso restrito <span class="vbadge">v3.4.3</span></div>
+    <div style="font-size:10px;color:var(--txt3);margin-top:20px;text-align:center">dash.wave41.com.br · Acesso restrito <span class="vbadge">v3.4.4</span></div>
   </div>
 </div>
 
@@ -280,7 +280,7 @@ tbody tr.clickable:hover{background:var(--surface3)}
 
   <footer class="footer">
     <div class="foot-l">Operado por <strong>Trilha 41</strong> para <strong>Rodrigo Chociai · Ademicon</strong></div>
-    <div class="foot-r"><span id="last-upd">—</span><span class="vbadge">v3.4.3</span></div>
+    <div class="foot-r"><span id="last-upd">—</span><span class="vbadge">v3.4.4</span></div>
   </footer>
 </div>
 
@@ -714,7 +714,10 @@ function goToPage(p) {
 // ── MODAL DETALHE DO LEAD ─────────────────────────────────────
 function renderNotasHtml(notasJson) {
   let notas = []
-  try { notas = JSON.parse(notasJson || '[]') } catch(e) {}
+  try {
+    // Supabase JSONB retorna já como array JS — JSON.parse só se for string
+    notas = Array.isArray(notasJson) ? notasJson : JSON.parse(notasJson || '[]')
+  } catch(e) {}
   if (!notas.length) return ''
   const tipoNota = t => ({2:'📝 Nota', 4:'⚙️ Sistema', 13:'📞 Ligação'}[t] || '💬 Nota')
   const fmtD = v => { try { return new Date(v).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) } catch(e) { return '—' } }
