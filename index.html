@@ -242,7 +242,7 @@ tbody tr.clickable:hover{background:var(--surface3)}
     <div class="fg"><label>Senha</label><input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password"></div>
     <button class="btn-login" id="btn-login" onclick="doLogin()">Entrar</button>
     <div class="login-err" id="l-err"></div>
-    <div style="font-size:10px;color:var(--txt3);margin-top:20px;text-align:center">dash.wave41.com.br · Acesso restrito <span class="vbadge">v3.4.4</span></div>
+    <div style="font-size:10px;color:var(--txt3);margin-top:20px;text-align:center">dash.wave41.com.br · Acesso restrito <span class="vbadge">v3.4.5</span></div>
   </div>
 </div>
 
@@ -280,7 +280,7 @@ tbody tr.clickable:hover{background:var(--surface3)}
 
   <footer class="footer">
     <div class="foot-l">Operado por <strong>Trilha 41</strong> para <strong>Rodrigo Chociai · Ademicon</strong></div>
-    <div class="foot-r"><span id="last-upd">—</span><span class="vbadge">v3.4.4</span></div>
+    <div class="foot-r"><span id="last-upd">—</span><span class="vbadge">v3.4.5</span></div>
   </footer>
 </div>
 
@@ -370,6 +370,12 @@ async function loadData() {
     'Atualizado: ' + new Date().toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' })
   spinning(false)
   resetCd()
+  // Auto-abre modal se URL tiver #lead=ID
+  const hash = window.location.hash
+  if (hash.startsWith('#lead=')) {
+    const leadId = hash.replace('#lead=', '')
+    if (leadId) openLeadModal(leadId)
+  }
 }
 
 function populateCampanhas() {
@@ -891,11 +897,14 @@ function openLeadModal(leadId) {
   document.getElementById('lead-modal-content').innerHTML = content
   document.getElementById('lead-modal').classList.add('show')
   document.body.style.overflow = 'hidden'
+  // Atualiza URL com o ID do lead para compartilhamento
+  history.replaceState(null, '', '#lead=' + leadId)
 }
 
 function closeLeadModal() {
   document.getElementById('lead-modal').classList.remove('show')
   document.body.style.overflow = ''
+  history.replaceState(null, '', window.location.pathname)
 }
 
 // Esc fecha o modal
