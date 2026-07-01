@@ -242,7 +242,7 @@ tbody tr.clickable:hover{background:var(--surface3)}
     <div class="fg"><label>Senha</label><input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password"></div>
     <button class="btn-login" id="btn-login" onclick="doLogin()">Entrar</button>
     <div class="login-err" id="l-err"></div>
-    <div style="font-size:10px;color:var(--txt3);margin-top:20px;text-align:center">dash.wave41.com.br · Acesso restrito <span class="vbadge">v3.4.0</span></div>
+    <div style="font-size:10px;color:var(--txt3);margin-top:20px;text-align:center">dash.wave41.com.br · Acesso restrito <span class="vbadge">v3.4.1</span></div>
   </div>
 </div>
 
@@ -280,7 +280,7 @@ tbody tr.clickable:hover{background:var(--surface3)}
 
   <footer class="footer">
     <div class="foot-l">Operado por <strong>Trilha 41</strong> para <strong>Rodrigo Chociai · Ademicon</strong></div>
-    <div class="foot-r"><span id="last-upd">—</span><span class="vbadge">v3.4.0</span></div>
+    <div class="foot-r"><span id="last-upd">—</span><span class="vbadge">v3.4.1</span></div>
   </footer>
 </div>
 
@@ -389,9 +389,9 @@ const QF_DEFS = {
   interesse:  { label: 'Interesse mapeado',      test: l => l.interesse_mapeado },
   qualificado:{ label: 'Lead qualificado',       test: l => l.houve_agendamento || l.reuniao_agendada },
   compareceu: { label: 'Compareceu (reunião/oport.)', test: l => l.reuniao_realizada },
-  erro:       { label: 'Erro no envio',          test: l => l.erro_envio || l.status === 'Erro no envio' },
+  erro:       { label: 'Erro no envio (sem resposta)', test: l => (l.erro_envio || l.status === 'Erro no envio') && !l.houve_resposta },
   contatados: { label: 'Contatados',             test: l => l.status !== 'Etapa de leads de entrada' },
-  entregues:  { label: 'Entregues',              test: l => l.status !== 'Etapa de leads de entrada' && !(l.erro_envio || l.status === 'Erro no envio') },
+  entregues:  { label: 'Entregues',              test: l => l.status !== 'Etapa de leads de entrada' && !((l.erro_envio || l.status === 'Erro no envio') && !l.houve_resposta) },
 }
 
 function toggleQuickFilter(key) {
@@ -519,7 +519,7 @@ function renderKpis() {
   const total       = L.length
   const perdidos    = L.filter(l => l.is_perdido).length
   const ativos      = total - perdidos
-  const erros       = L.filter(l => l.erro_envio || l.status === 'Erro no envio').length
+  const erros       = L.filter(l => (l.erro_envio || l.status === 'Erro no envio') && !l.houve_resposta).length
   const contatados  = L.filter(l => l.status !== 'Etapa de leads de entrada').length
   const entregues   = Math.max(0, contatados - erros)
   const respondeu   = L.filter(l => l.houve_resposta).length
@@ -549,8 +549,8 @@ function renderFunil() {
   const L = FILTERED
   const total      = L.length || 1
   const contatados = L.filter(l => l.status !== 'Etapa de leads de entrada').length
-  const erros      = L.filter(l => l.erro_envio || l.status === 'Erro no envio').length
-  // CORREÇÃO: entregues = contatados - erros (não total - erros)
+  // Erro só conta se o lead nunca respondeu — se respondeu, a mensagem chegou
+  const erros      = L.filter(l => (l.erro_envio || l.status === 'Erro no envio') && !l.houve_resposta).length
   const entregues  = Math.max(0, contatados - erros)
   const respondeu  = L.filter(l => l.houve_resposta).length
   const conversa   = L.filter(l => l.em_conversa).length
@@ -619,7 +619,7 @@ function renderCampanhas() {
     const L = FILTERED.filter(l => l.campanha === camp)
     const total     = L.length
     const contat    = L.filter(l => l.status !== 'Etapa de leads de entrada').length
-    const erros     = L.filter(l => l.erro_envio || l.status === 'Erro no envio').length
+    const erros     = L.filter(l => (l.erro_envio || l.status === 'Erro no envio') && !l.houve_resposta).length
     const entregues = Math.max(0, contat - erros)
     const respondeu = L.filter(l => l.houve_resposta).length
     const perdidos  = L.filter(l => l.is_perdido).length
